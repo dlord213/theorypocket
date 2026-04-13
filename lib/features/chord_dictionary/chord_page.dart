@@ -33,7 +33,8 @@ class ChordPage extends ConsumerWidget {
         ),
         title: ShaderMask(
           shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.secondary, AppColors.primaryLight],
+            colors: [AppColors.textPrimary, AppColors.primaryLight],
+            stops: [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Chord Dictionary',

@@ -3,8 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:theorypocket/app/router.dart';
 import 'package:theorypocket/app/theme.dart';
+import 'package:theorypocket/features/dashboard/widgets/daily_tip_card.dart';
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -83,12 +85,7 @@ class _DashboardPageState extends State<DashboardPage>
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Text(
-                          '♩',
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                      ),
+                      child: const Center(child: Icon(LucideIcons.music)),
                     ),
                     const SizedBox(width: 10),
                     ShaderMask(
@@ -183,12 +180,60 @@ class _DashboardPageState extends State<DashboardPage>
                       ),
                     ),
 
+                    const SizedBox(height: 12),
+
+                    // Metronome — full-width compact card
+                    FadeTransition(
+                      opacity: _fade(0.55, 0.90),
+                      child: SlideTransition(
+                        position: _slide(0.55, 0.90),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _MetronomeCard(
+                            onTap: () => context.push(AppRoutes.metronome),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Polyrhythm — full-width compact card
+                    FadeTransition(
+                      opacity: _fade(0.65, 0.95),
+                      child: SlideTransition(
+                        position: _slide(0.65, 0.95),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _PolyrhythmCard(
+                            onTap: () => context.push(AppRoutes.polyrhythm),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Tuner — full-width compact card
+                    FadeTransition(
+                      opacity: _fade(0.75, 1.0),
+                      child: SlideTransition(
+                        position: _slide(0.75, 1.0),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _TunerCard(
+                            onTap: () => context.push(AppRoutes.tuner),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Daily tip
                     FadeTransition(
-                      opacity: _fade(0.6, 1.0),
-                      child: const _DailyTipCard(),
+                      opacity: _fade(0.7, 1.0),
+                      child: const DailyTipCard(),
                     ),
                   ]),
                 ),
@@ -196,6 +241,438 @@ class _DashboardPageState extends State<DashboardPage>
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Metronome Card ────────────────────────────────────────────────────────────
+
+class _MetronomeCard extends StatefulWidget {
+  final VoidCallback onTap;
+  const _MetronomeCard({required this.onTap});
+
+  @override
+  State<_MetronomeCard> createState() => _MetronomeCardState();
+}
+
+class _MetronomeCardState extends State<_MetronomeCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 120));
+    _scale = Tween<double>(begin: 1.0, end: 0.97)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: GestureDetector(
+        onTapDown: (_) => _ctrl.forward(),
+        onTapUp: (_) async {
+          await _ctrl.reverse();
+          widget.onTap();
+        },
+        onTapCancel: () => _ctrl.reverse(),
+        child: Container(
+          height: 82,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFF43F5E), Color(0xFF7C3AED)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFF43F5E).withOpacity(0.32),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decorative orb
+              Positioned(
+                right: -20,
+                top: -20,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.07),
+                  ),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                      ),
+                      child: const Icon(
+                        Icons.access_time_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Metronome & Tap Tempo',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Set BPM with a slider or tap to feel the beat',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.white.withOpacity(0.70),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Polyrhythm Card ───────────────────────────────────────────────────────────
+
+class _PolyrhythmCard extends StatefulWidget {
+  final VoidCallback onTap;
+  const _PolyrhythmCard({required this.onTap});
+
+  @override
+  State<_PolyrhythmCard> createState() => _PolyrhythmCardState();
+}
+
+class _PolyrhythmCardState extends State<_PolyrhythmCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 120));
+    _scale = Tween<double>(begin: 1.0, end: 0.97)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: GestureDetector(
+        onTapDown: (_) => _ctrl.forward(),
+        onTapUp: (_) async {
+          await _ctrl.reverse();
+          widget.onTap();
+        },
+        onTapCancel: () => _ctrl.reverse(),
+        child: Container(
+          height: 82,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.teal, Color(0xFF0369A1)], // Teal to deep cyan/blue
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.teal.withOpacity(0.32),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decorative orb
+              Positioned(
+                right: -20,
+                top: -20,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.07),
+                  ),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                      ),
+                      child: const Icon(
+                        Icons.blur_circular_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Polyrhythm Generator',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Layer rhythms and visualize complex meters',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.white.withOpacity(0.70),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Tuner Card ──────────────────────────────────────────────────────────────────
+
+class _TunerCard extends StatefulWidget {
+  final VoidCallback onTap;
+  const _TunerCard({required this.onTap});
+
+  @override
+  State<_TunerCard> createState() => _TunerCardState();
+}
+
+class _TunerCardState extends State<_TunerCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 120));
+    _scale = Tween<double>(begin: 1.0, end: 0.97)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: GestureDetector(
+        onTapDown: (_) => _ctrl.forward(),
+        onTapUp: (_) async {
+          await _ctrl.reverse();
+          widget.onTap();
+        },
+        onTapCancel: () => _ctrl.reverse(),
+        child: Container(
+          height: 82,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFEAB308), Color(0xFF10B981)], // Yellow to Emerald
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF10B981).withOpacity(0.32),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decorative orb
+              Positioned(
+                right: -20,
+                top: -20,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.07),
+                  ),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                      ),
+                      child: const Icon(
+                        Icons.mic_external_on_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Chromatic Tuner',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Instantly check pitch perfectly',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.white.withOpacity(0.70),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -784,97 +1261,6 @@ class _CompactCardState extends State<_CompactCard>
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Daily Tip Card ────────────────────────────────────────────────────────────
-
-class _DailyTipCard extends StatelessWidget {
-  const _DailyTipCard();
-
-  static const _tips = [
-    'The Circle of Fifths shows which keys are closely related — adjacent keys share 6 out of 7 notes!',
-    'A ii–V–I progression is the backbone of jazz. Try it in C: Dm7 → G7 → Cmaj7.',
-    'The relative minor shares the same key signature as its major. C major ↔ A minor.',
-    'Suspended chords (sus2, sus4) create unresolved tension — perfect for cinematic moments.',
-  ];
-
-  String get _tip {
-    final day = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
-    return _tips[day % _tips.length];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(0, 18, 18, 18),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.surfaceBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Gradient left stripe
-            Container(
-              width: 4,
-              height: 56,
-              margin: const EdgeInsets.only(left: 18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.gradientSecondary,
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Text('💡', style: TextStyle(fontSize: 13)),
-                      const SizedBox(width: 6),
-                      Text(
-                        'DAILY TIP',
-                        style: GoogleFonts.inter(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondary,
-                          letterSpacing: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _tip,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                      height: 1.55,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );

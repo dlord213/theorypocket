@@ -29,7 +29,8 @@ class CirclePage extends ConsumerWidget {
         ),
         title: ShaderMask(
           shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.primaryLight, AppColors.secondary],
+            colors: [AppColors.textPrimary, AppColors.primaryLight],
+            stops: [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Circle of Fifths',
@@ -73,7 +74,10 @@ class CirclePage extends ConsumerWidget {
                 ),
               ),
               child: selection != null
-                  ? _KeyBanner(key: ValueKey(selection.index), selection: selection)
+                  ? _KeyBanner(
+                      key: ValueKey(selection.index),
+                      selection: selection,
+                    )
                   : _HintBanner(key: const ValueKey('hint')),
             ),
             Expanded(
@@ -83,7 +87,10 @@ class CirclePage extends ConsumerWidget {
                 child: Center(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final size = min(constraints.maxWidth, constraints.maxHeight);
+                      final size = min(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
                       return _CircleWidget(
                         size: size,
                         selection: selection,
@@ -145,20 +152,20 @@ class _KeyBanner extends StatelessWidget {
     final keyName = isMajor
         ? '${majorKeys[selection.index]} Major'
         : isMinor
-            ? minorKeys[selection.index]
-            : dimKeys[selection.index];
+        ? minorKeys[selection.index]
+        : dimKeys[selection.index];
 
     final subtitle = isMajor
         ? 'Relative minor: ${minorKeys[selection.index]}'
         : isMinor
-            ? 'Relative major: ${majorKeys[selection.index]}'
-            : 'Diminished chord';
+        ? 'Relative major: ${majorKeys[selection.index]}'
+        : 'Diminished chord';
 
     final color = isMajor
         ? AppColors.primary
         : isMinor
-            ? AppColors.secondary
-            : AppColors.teal;
+        ? AppColors.secondary
+        : AppColors.teal;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
@@ -199,7 +206,11 @@ class _KeyBanner extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                isMajor ? 'MAJOR' : isMinor ? 'MINOR' : 'DIM',
+                isMajor
+                    ? 'MAJOR'
+                    : isMinor
+                    ? 'MINOR'
+                    : 'DIM',
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -268,7 +279,10 @@ class _DiatonicPanel extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 '— ${majorKeys[keyIndex]} Major',
-                style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
               ),
             ],
           ),
@@ -286,8 +300,8 @@ class _DiatonicPanel extends StatelessWidget {
               final Color chipColor = type == 0
                   ? AppColors.primary
                   : type == 1
-                      ? AppColors.teal
-                      : AppColors.rose;
+                  ? AppColors.teal
+                  : AppColors.rose;
               return _ChordChip(
                 numeral: romanNumerals[i],
                 chord: chords[i],

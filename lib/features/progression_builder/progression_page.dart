@@ -34,7 +34,8 @@ class ProgressionPage extends ConsumerWidget {
         ),
         title: ShaderMask(
           shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.teal, AppColors.primaryLight],
+            colors: [AppColors.textPrimary, AppColors.primaryLight],
+            stops: [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Progression Builder',
@@ -116,7 +117,8 @@ class ProgressionPage extends ConsumerWidget {
                           child: Text(
                             'Cancel',
                             style: GoogleFonts.inter(
-                                color: AppColors.textMuted),
+                              color: AppColors.textMuted,
+                            ),
                           ),
                         ),
                         TextButton(
@@ -124,8 +126,9 @@ class ProgressionPage extends ConsumerWidget {
                           child: Text(
                             'Delete',
                             style: GoogleFonts.inter(
-                                color: AppColors.rose,
-                                fontWeight: FontWeight.w700),
+                              color: AppColors.rose,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -143,7 +146,8 @@ class ProgressionPage extends ConsumerWidget {
                         backgroundColor: AppColors.teal.withOpacity(0.9),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         duration: const Duration(seconds: 2),
                         content: Text(
                           halfSteps > 0
@@ -215,7 +219,9 @@ class _EmptyState extends StatelessWidget {
               onTap: onTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 13),
+                  horizontal: 24,
+                  vertical: 13,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: AppColors.gradientPrimary,
@@ -232,8 +238,11 @@ class _EmptyState extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_rounded,
-                        color: Colors.white, size: 18),
+                    const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Create first progression',

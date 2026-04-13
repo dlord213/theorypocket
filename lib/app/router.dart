@@ -3,13 +3,19 @@ import 'package:go_router/go_router.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_page.dart';
 import 'package:theorypocket/features/chord_dictionary/chord_page.dart';
 import 'package:theorypocket/features/dashboard/dashboard_page.dart';
+import 'package:theorypocket/features/metronome/metronome_page.dart';
+import 'package:theorypocket/features/polyrhythm/polyrhythm_page.dart';
 import 'package:theorypocket/features/progression_builder/progression_page.dart';
+import 'package:theorypocket/features/tuner/tuner_page.dart';
 
 class AppRoutes {
   static const String dashboard = '/';
   static const String circle = '/circle';
   static const String chords = '/chords';
   static const String progression = '/progression';
+  static const String metronome = '/metronome';
+  static const String polyrhythm = '/polyrhythm';
+  static const String tuner = '/tuner';
 }
 
 final goRouter = GoRouter(
@@ -50,6 +56,33 @@ final goRouter = GoRouter(
         context,
         state,
         const ProgressionPage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.metronome,
+      name: 'metronome',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const MetronomePage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.polyrhythm,
+      name: 'polyrhythm',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const PolyrhythmPage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.tuner,
+      name: 'tuner',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const TunerPage(),
       ),
     ),
   ],
