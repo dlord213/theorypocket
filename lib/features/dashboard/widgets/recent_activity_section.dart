@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/shared/providers/app_state_provider.dart';
 
 class RecentActivitySection extends StatelessWidget {
@@ -23,7 +22,7 @@ class RecentActivitySection extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
@@ -32,7 +31,7 @@ class RecentActivitySection extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.primaryLight,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                 ),
               ),
             ],
@@ -94,11 +93,11 @@ class _ActivityTileState extends State<_ActivityTile>
   Color _iconColor() {
     switch (widget.item.type) {
       case ActivityType.chord:
-        return AppColors.secondary;
+        return Theme.of(context).colorScheme.secondary;
       case ActivityType.circle:
-        return AppColors.primary;
+        return Theme.of(context).colorScheme.primary;
       case ActivityType.progression:
-        return AppColors.teal;
+        return Theme.of(context).colorScheme.tertiary;
     }
   }
 
@@ -130,9 +129,9 @@ class _ActivityTileState extends State<_ActivityTile>
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.surfaceBorder),
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
           ),
           child: Row(
             children: [
@@ -162,7 +161,7 @@ class _ActivityTileState extends State<_ActivityTile>
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -170,7 +169,7 @@ class _ActivityTileState extends State<_ActivityTile>
                       widget.item.detail,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppColors.textMuted,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -181,7 +180,7 @@ class _ActivityTileState extends State<_ActivityTile>
                 _timeAgo(),
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: AppColors.textMuted,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
             ],

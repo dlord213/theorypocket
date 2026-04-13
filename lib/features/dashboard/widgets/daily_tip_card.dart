@@ -2,10 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 
 class DailyTipCard extends StatelessWidget {
-  const DailyTipCard();
+  const DailyTipCard({super.key});
 
   static const _tips = [
     'The Circle of Fifths shows which keys are closely related — adjacent keys share 6 out of 7 notes!',
@@ -26,9 +25,9 @@ class DailyTipCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(0, 18, 18, 18),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.surfaceBorder),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.18),
@@ -46,8 +45,8 @@ class DailyTipCard extends StatelessWidget {
               height: 56,
               margin: const EdgeInsets.only(left: 18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.gradientSecondary,
+                gradient: LinearGradient(
+                  colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.primary],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -68,7 +67,7 @@ class DailyTipCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.secondary,
+                          color: Theme.of(context).colorScheme.secondary,
                           letterSpacing: 1.3,
                         ),
                       ),
@@ -79,7 +78,7 @@ class DailyTipCard extends StatelessWidget {
                     _tip,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.55,
                     ),
                   ),

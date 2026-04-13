@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/progression_builder/providers/progression_provider.dart';
 import 'package:theorypocket/features/progression_builder/song_editor_page.dart';
 import 'package:theorypocket/features/progression_builder/widgets/song_card.dart';
@@ -24,18 +23,18 @@ class ProgressionPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: Theme.of(context).colorScheme.onSurface,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: ShaderMask(
-          shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.textPrimary, AppColors.primaryLight],
-            stops: [0.4, 1.0],
+          shaderCallback: (b) => LinearGradient(
+            colors: [Theme.of(context).colorScheme.onSurface, Theme.of(context).colorScheme.primary],
+            stops: const [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Progression Builder',
@@ -49,7 +48,7 @@ class ProgressionPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => openEditor(),
-        backgroundColor: AppColors.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -63,13 +62,13 @@ class ProgressionPage extends ConsumerWidget {
         ),
       ),
       body: songsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
         ),
         error: (e, _) => Center(
           child: Text(
             'Error loading songs:\n$e',
-            style: GoogleFonts.inter(color: AppColors.rose),
+            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.error),
             textAlign: TextAlign.center,
           ),
         ),
@@ -91,24 +90,24 @@ class ProgressionPage extends ConsumerWidget {
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      backgroundColor: AppColors.surfaceElevated,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(color: AppColors.surfaceBorder),
+                        side: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                       ),
                       title: Text(
                         'Delete "${song.title}"?',
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       content: Text(
                         'This progression will be permanently removed.',
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       actions: [
@@ -117,7 +116,7 @@ class ProgressionPage extends ConsumerWidget {
                           child: Text(
                             'Cancel',
                             style: GoogleFonts.inter(
-                              color: AppColors.textMuted,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                             ),
                           ),
                         ),
@@ -126,7 +125,7 @@ class ProgressionPage extends ConsumerWidget {
                           child: Text(
                             'Delete',
                             style: GoogleFonts.inter(
-                              color: AppColors.rose,
+                              color: Theme.of(context).colorScheme.error,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -143,7 +142,7 @@ class ProgressionPage extends ConsumerWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        backgroundColor: AppColors.teal.withOpacity(0.9),
+                        backgroundColor: Theme.of(context).colorScheme.tertiary.withOpacity(0.9),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -186,9 +185,9 @@ class _EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.teal.withOpacity(0.12),
+                color: Theme.of(context).colorScheme.tertiary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.teal.withOpacity(0.3)),
+                border: Border.all(color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3)),
               ),
               child: const Center(
                 child: Text('🎼', style: TextStyle(fontSize: 36)),
@@ -200,7 +199,7 @@ class _EmptyState extends StatelessWidget {
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -210,7 +209,7 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -223,13 +222,11 @@ class _EmptyState extends StatelessWidget {
                   vertical: 13,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: AppColors.gradientPrimary,
-                  ),
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_data.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_provider.dart';
 
@@ -17,8 +16,9 @@ const double _gapAngle = pi / 80; // ~2.25° gap between segments
 
 class CircleOfFifthsPainter extends CustomPainter {
   final CircleSelection? selection;
+  final ColorScheme colorScheme;
 
-  CircleOfFifthsPainter({required this.selection});
+  CircleOfFifthsPainter({required this.selection, required this.colorScheme});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -61,10 +61,10 @@ class CircleOfFifthsPainter extends CustomPainter {
         sweep: sweep,
         isSelected: majSel,
         isCompanion: majCompanion,
-        gradientColors: AppColors.gradientPrimary,
-        companionColor: AppColors.primary.withOpacity(0.20),
-        defaultColor: AppColors.surfaceElevated,
-        outlineColor: AppColors.surfaceBorder,
+        gradientColors: [colorScheme.primary, colorScheme.primary.withOpacity(0.7)],
+        companionColor: colorScheme.primary.withOpacity(0.15),
+        defaultColor: colorScheme.surfaceContainerHigh,
+        outlineColor: colorScheme.outline.withOpacity(0.5),
       );
 
       // ── Minor ring ────────────────────────────────────────────────────────
@@ -77,10 +77,10 @@ class CircleOfFifthsPainter extends CustomPainter {
         sweep: sweep,
         isSelected: minSel,
         isCompanion: minCompanion,
-        gradientColors: [AppColors.secondary, const Color(0xFFD97706)],
-        companionColor: AppColors.secondary.withOpacity(0.18),
-        defaultColor: AppColors.surface,
-        outlineColor: AppColors.surfaceBorder,
+        gradientColors: [colorScheme.secondary, colorScheme.secondary.withOpacity(0.7)],
+        companionColor: colorScheme.secondary.withOpacity(0.15),
+        defaultColor: colorScheme.surfaceContainer,
+        outlineColor: colorScheme.outline.withOpacity(0.5),
       );
 
       // ── Dim ring ──────────────────────────────────────────────────────────
@@ -93,10 +93,10 @@ class CircleOfFifthsPainter extends CustomPainter {
         sweep: sweep,
         isSelected: dimSel,
         isCompanion: false,
-        gradientColors: [AppColors.teal, const Color(0xFF059669)],
+        gradientColors: [colorScheme.tertiary, colorScheme.tertiary.withOpacity(0.7)],
         companionColor: Colors.transparent,
-        defaultColor: AppColors.surface.withOpacity(0.70),
-        outlineColor: AppColors.surfaceBorder,
+        defaultColor: colorScheme.surface,
+        outlineColor: colorScheme.outline.withOpacity(0.5),
       );
     }
 
@@ -119,8 +119,8 @@ class CircleOfFifthsPainter extends CustomPainter {
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: isSelected && selection?.ring == CircleRing.major
-            ? Colors.white
-            : AppColors.textPrimary,
+            ? colorScheme.onPrimary
+            : colorScheme.onSurface,
       );
 
       // Minor label — inside minor ring
@@ -133,8 +133,8 @@ class CircleOfFifthsPainter extends CustomPainter {
         fontSize: 10.5,
         fontWeight: FontWeight.w600,
         color: isSelected && selection?.ring == CircleRing.minor
-            ? Colors.white
-            : AppColors.textSecondary,
+            ? colorScheme.onSecondary
+            : colorScheme.onSurfaceVariant,
       );
 
       // Dim label — inside dim ring
@@ -147,8 +147,8 @@ class CircleOfFifthsPainter extends CustomPainter {
         fontSize: 7.5,
         fontWeight: FontWeight.w500,
         color: isSelected && selection?.ring == CircleRing.dim
-            ? Colors.white
-            : AppColors.textMuted,
+            ? colorScheme.onTertiary
+            : colorScheme.onSurfaceVariant.withOpacity(0.7),
       );
     }
   }
@@ -222,7 +222,7 @@ class CircleOfFifthsPainter extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.fill
       ..shader = RadialGradient(
-        colors: [AppColors.surfaceElevated, AppColors.surface],
+        colors: [colorScheme.surfaceContainerHigh, colorScheme.surface],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
     canvas.drawCircle(center, radius, paint);
 
@@ -232,15 +232,15 @@ class CircleOfFifthsPainter extends CustomPainter {
       radius,
       Paint()
         ..style = PaintingStyle.stroke
-        ..color = AppColors.primary.withOpacity(0.4)
+        ..color = colorScheme.primary.withOpacity(0.3)
         ..strokeWidth = 1.5,
     );
 
     // Music note emoji via TextPainter
     final tp = TextPainter(
-      text: const TextSpan(
+      text: TextSpan(
         text: '𝄞', // treble clef unicode
-        style: TextStyle(fontSize: 26, color: AppColors.textMuted),
+        style: TextStyle(fontSize: 26, color: colorScheme.onSurfaceVariant.withOpacity(0.6)),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -279,7 +279,7 @@ class CircleOfFifthsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CircleOfFifthsPainter old) =>
-      old.selection != selection;
+      old.selection != selection || old.colorScheme != colorScheme;
 }
 
 // ── Hit testing helper ────────────────────────────────────────────────────────

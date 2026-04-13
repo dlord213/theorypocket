@@ -1,157 +1,158 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AppColors {
-  // Backgrounds
-  static const background = Color(0xFF0F0A1E);
-  static const surface = Color(0xFF1A1133);
-  static const surfaceElevated = Color(0xFF221845);
-  static const surfaceBorder = Color(0xFF2D2050);
-
-  // Accents
-  static const primary = Color(0xFF7C3AED); // Violet
-  static const primaryLight = Color(0xFF9D5FF5);
-  static const primaryDark = Color(0xFF5B21B6);
-  static const secondary = Color(0xFFF59E0B); // Amber/Gold
-  static const secondaryLight = Color(0xFFFBBF24);
-  static const teal = Color(0xFF10B981);
-  static const rose = Color(0xFFF43F5E);
-
-  // Text
-  static const textPrimary = Color(0xFFF8F7FF);
-  static const textSecondary = Color(0xFFAA9EC7);
-  static const textMuted = Color(0xFF6B5D8A);
-
-  // Gradients
-  static const gradientPrimary = [Color(0xFF7C3AED), Color(0xFF5B21B6)];
-  static const gradientSecondary = [Color(0xFFF59E0B), Color(0xFFD97706)];
-  static const gradientTeal = [Color(0xFF10B981), Color(0xFF059669)];
-  static const gradientRose = [Color(0xFFF43F5E), Color(0xFFBE123C)];
-  static const gradientCard1 = [Color(0xFF7C3AED), Color(0xFF4338CA)]; // Circle of Fifths
-  static const gradientCard2 = [Color(0xFFF59E0B), Color(0xFFEA580C)]; // Chord Dictionary
-  static const gradientCard3 = [Color(0xFF10B981), Color(0xFF0891B2)]; // Progression Builder
-}
-
 class AppTheme {
+  static const primaryLime = Color(0xFFA3E635);
+
+  static ThemeData get light {
+    final base = ThemeData.light(useMaterial3: true);
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: primaryLime,
+      brightness: Brightness.light,
+      surface: const Color(0xFFF8FAFC),
+      onSurface: const Color(0xFF0F172A),
+      surfaceContainer: const Color(0xFFF1F5F9),
+      surfaceContainerHigh: const Color(0xFFE2E8F0),
+      primary: const Color(0xFF65A30D),
+      onPrimary: Colors.white,
+      secondary: const Color(0xFF059669),
+      tertiary: const Color(0xFF0D9488),
+      outline: const Color(0xFFCBD5E1),
+    );
+    return _build(base, colorScheme);
+  }
+
   static ThemeData get dark {
     final base = ThemeData.dark(useMaterial3: true);
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: primaryLime,
+      brightness: Brightness.dark,
+      surface: const Color(0xFF000000), // AMOLED Black
+      onSurface: const Color(0xFFF8FAFC),
+      surfaceContainer: const Color(0xFF0F172A),
+      surfaceContainerHigh: const Color(0xFF1E293B),
+      primary: primaryLime,
+      onPrimary: Colors.black,
+      secondary: const Color(0xFF34D399),
+      tertiary: const Color(0xFF2DD4BF),
+      outline: const Color(0xFF334155),
+    );
+    return _build(base, colorScheme);
+  }
 
+  static ThemeData _build(ThemeData base, ColorScheme colorScheme) {
     return base.copyWith(
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        surface: AppColors.surface,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: AppColors.textPrimary,
-      ),
-      textTheme: _buildTextTheme(base.textTheme),
-      cardTheme: CardThemeData(
-        color: AppColors.surface,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.surfaceBorder, width: 1),
-        ),
-      ),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        centerTitle: false,
         titleTextStyle: GoogleFonts.spaceGrotesk(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
+          fontSize: 28, // OneUI typically has larger, bolder headers
+          fontWeight: FontWeight.w800,
+          color: colorScheme.onSurface,
+          letterSpacing: -0.5,
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.surfaceBorder,
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainer,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32), // Modern M3 / OneUI massive curves
+          side: BorderSide(color: colorScheme.outline.withOpacity(0.5), width: 1),
+        ),
+      ),
+      dividerTheme: DividerThemeData(
+        color: colorScheme.outline.withOpacity(0.5),
         thickness: 1,
       ),
-      iconTheme: const IconThemeData(color: AppColors.textSecondary),
+      iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+      textTheme: _buildTextTheme(base.textTheme, colorScheme),
     );
   }
 
-  static TextTheme _buildTextTheme(TextTheme base) {
+  static TextTheme _buildTextTheme(TextTheme base, ColorScheme colorScheme) {
     return base.copyWith(
       displayLarge: GoogleFonts.spaceGrotesk(
         fontSize: 57,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       displayMedium: GoogleFonts.spaceGrotesk(
         fontSize: 45,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       displaySmall: GoogleFonts.spaceGrotesk(
         fontSize: 36,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       headlineLarge: GoogleFonts.spaceGrotesk(
         fontSize: 32,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       headlineMedium: GoogleFonts.spaceGrotesk(
         fontSize: 28,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       headlineSmall: GoogleFonts.spaceGrotesk(
         fontSize: 24,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       titleLarge: GoogleFonts.spaceGrotesk(
         fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w700,
+        color: colorScheme.onSurface,
       ),
       titleMedium: GoogleFonts.spaceGrotesk(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       titleSmall: GoogleFonts.spaceGrotesk(
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
+        color: colorScheme.onSurfaceVariant,
       ),
       bodyLarge: GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       bodyMedium: GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
+        color: colorScheme.onSurfaceVariant,
       ),
       bodySmall: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: AppColors.textMuted,
+        color: colorScheme.onSurfaceVariant.withOpacity(0.8),
       ),
       labelLarge: GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
       labelMedium: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
+        color: colorScheme.onSurfaceVariant,
       ),
       labelSmall: GoogleFonts.inter(
         fontSize: 10,
         fontWeight: FontWeight.w500,
-        color: AppColors.textMuted,
+        color: colorScheme.onSurfaceVariant.withOpacity(0.8),
         letterSpacing: 1.2,
       ),
     );
   }
 }
+

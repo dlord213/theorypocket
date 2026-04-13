@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 
 class MetronomePage extends StatefulWidget {
   const MetronomePage({super.key});
@@ -116,8 +115,9 @@ class _MetronomePageState extends State<MetronomePage>
 
   void _updateBpm(double newBpm) {
     setState(() => _bpm = newBpm);
-    if (_isPlaying) _startMetronome(); // restart with new tempo
-    else {
+    if (_isPlaying) {
+      _startMetronome(); // restart with new tempo
+    } else {
       _pendulumCtrl.duration = _beatDuration;
     }
   }
@@ -173,22 +173,24 @@ class _MetronomePageState extends State<MetronomePage>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: colorScheme.onSurface,
           onPressed: () {
             _stopMetronome();
             Navigator.of(context).pop();
           },
         ),
         title: ShaderMask(
-          shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.textPrimary, AppColors.primaryLight],
-            stops: [0.4, 1.0],
+          shaderCallback: (b) => LinearGradient(
+            colors: [colorScheme.onSurface, colorScheme.primary],
+            stops: const [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Metronome',
@@ -242,7 +244,7 @@ class _MetronomePageState extends State<MetronomePage>
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 64,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: colorScheme.onSurface,
                               height: 1.0,
                             ),
                           ),
@@ -251,7 +253,7 @@ class _MetronomePageState extends State<MetronomePage>
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textMuted,
+                              color: colorScheme.onSurfaceVariant.withOpacity(0.8),
                               letterSpacing: 2,
                             ),
                           ),
@@ -270,10 +272,10 @@ class _MetronomePageState extends State<MetronomePage>
                   // Slider
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppColors.primary,
-                      inactiveTrackColor: AppColors.surfaceBorder,
-                      thumbColor: AppColors.primaryLight,
-                      overlayColor: AppColors.primary.withOpacity(0.14),
+                      activeTrackColor: colorScheme.primary,
+                      inactiveTrackColor: colorScheme.outline.withOpacity(0.5),
+                      thumbColor: colorScheme.onPrimary,
+                      overlayColor: colorScheme.primary.withOpacity(0.14),
                       trackHeight: 3,
                       thumbShape:
                           const RoundSliderThumbShape(enabledThumbRadius: 7),
@@ -294,7 +296,7 @@ class _MetronomePageState extends State<MetronomePage>
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.secondary,
+                          color: colorScheme.secondary,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -331,7 +333,7 @@ class _MetronomePageState extends State<MetronomePage>
 
   TextStyle get _labelStyle => GoogleFonts.inter(
         fontSize: 11,
-        color: AppColors.textMuted,
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
       );
 }
 
@@ -358,6 +360,7 @@ class _BeatVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constraints.maxWidth.clamp(0.0, 280.0);
@@ -380,13 +383,13 @@ class _BeatVisual extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary
+                            color: colorScheme.primary
                                 .withOpacity(0.38 * glowAnim.value),
                             blurRadius: 50,
                             spreadRadius: 12,
                           ),
                           BoxShadow(
-                            color: AppColors.primaryLight
+                            color: colorScheme.primaryContainer
                                 .withOpacity(0.18 * glowAnim.value),
                             blurRadius: 80,
                             spreadRadius: 20,
@@ -400,7 +403,7 @@ class _BeatVisual extends StatelessWidget {
                 // Pendulum arc (visible track)
                 CustomPaint(
                   size: Size(size * 0.78, size * 0.78),
-                  painter: _PendulumArcPainter(),
+                  painter: _PendulumArcPainter(colorScheme: colorScheme),
                 ),
 
                 // Pendulum needle
@@ -420,8 +423,8 @@ class _BeatVisual extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primary.withOpacity(0.2),
-                              AppColors.primary,
+                              colorScheme.primary.withOpacity(0.2),
+                              colorScheme.primary,
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -447,20 +450,18 @@ class _BeatVisual extends StatelessWidget {
                           gradient: RadialGradient(
                             colors: beatActive
                                 ? [
-                                    AppColors.primaryLight,
-                                    AppColors.primary,
-                                    AppColors.primaryDark,
+                                    colorScheme.primaryContainer,
+                                    colorScheme.primary,
                                   ]
                                 : [
-                                    AppColors.surfaceElevated,
-                                    AppColors.surface,
-                                    AppColors.background,
+                                    colorScheme.surfaceContainerHigh,
+                                    colorScheme.surface,
                                   ],
                           ),
                           border: Border.all(
                             color: beatActive
-                                ? AppColors.primaryLight.withOpacity(0.7)
-                                : AppColors.surfaceBorder,
+                                ? colorScheme.primaryContainer.withOpacity(0.7)
+                                : colorScheme.outline.withOpacity(0.5),
                             width: 1.5,
                           ),
                         ),
@@ -489,6 +490,9 @@ class _BeatVisual extends StatelessWidget {
 // ── Pendulum arc painter ──────────────────────────────────────────────────────
 
 class _PendulumArcPainter extends CustomPainter {
+  final ColorScheme colorScheme;
+  _PendulumArcPainter({required this.colorScheme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
@@ -496,7 +500,7 @@ class _PendulumArcPainter extends CustomPainter {
     final r = size.width * 0.44;
 
     final paint = Paint()
-      ..color = AppColors.surfaceBorder.withOpacity(0.6)
+      ..color = colorScheme.outline.withOpacity(0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
@@ -524,8 +528,8 @@ class _PendulumArcPainter extends CustomPainter {
       Offset(cx, cy),
       4.5,
       Paint()
-        ..shader = const RadialGradient(
-          colors: [AppColors.primaryLight, AppColors.primaryDark],
+        ..shader = RadialGradient(
+          colors: [colorScheme.primaryContainer, colorScheme.primary],
         ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 4.5)),
     );
   }
@@ -556,11 +560,11 @@ class _NudgeButton extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.surfaceElevated,
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.surfaceBorder),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         ),
-        child: Icon(icon, color: AppColors.textSecondary, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
       ),
     );
   }
@@ -617,14 +621,14 @@ class _PlayStopButtonState extends State<_PlayStopButton>
             gradient: LinearGradient(
               colors: widget.isPlaying
                   ? [const Color(0xFFF43F5E), const Color(0xFFBE123C)]
-                  : AppColors.gradientPrimary,
+                  : [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: (widget.isPlaying ? AppColors.rose : AppColors.primary)
+                color: (widget.isPlaying ? const Color(0xFFF43F5E) : Theme.of(context).colorScheme.primary)
                     .withOpacity(0.40),
                 blurRadius: 22,
                 offset: const Offset(0, 6),
@@ -704,10 +708,10 @@ class _TapTempoButtonState extends State<_TapTempoButton>
           width: double.infinity,
           height: 64,
           decoration: BoxDecoration(
-            color: AppColors.surfaceElevated,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: AppColors.surfaceBorder,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
               width: 1.5,
             ),
           ),
@@ -719,7 +723,7 @@ class _TapTempoButtonState extends State<_TapTempoButton>
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: 2,
                 ),
               ),
@@ -727,7 +731,7 @@ class _TapTempoButtonState extends State<_TapTempoButton>
                 'Tap repeatedly to set tempo',
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: AppColors.textMuted,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
             ],

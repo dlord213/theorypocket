@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/progression_builder/models/song_model.dart';
 
 class SongCard extends StatelessWidget {
@@ -22,12 +21,12 @@ class SongCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceBorder),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.06),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.06),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -46,9 +45,7 @@ class SongCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: AppColors.gradientPrimary,
-                    ),
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -56,7 +53,7 @@ class SongCard extends StatelessWidget {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -67,22 +64,22 @@ class SongCard extends StatelessWidget {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 // Actions menu
                 PopupMenuButton<String>(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.more_vert_rounded,
-                    color: AppColors.textMuted,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                     size: 20,
                   ),
-                  color: AppColors.surfaceElevated,
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.surfaceBorder),
+                    side: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                   ),
                   onSelected: (v) {
                     if (v == 'edit') onEdit();
@@ -93,12 +90,12 @@ class SongCard extends StatelessWidget {
                       value: 'edit',
                       child: Row(
                         children: [
-                          const Icon(Icons.edit_outlined,
-                              size: 16, color: AppColors.textSecondary),
+                          Icon(Icons.edit_outlined,
+                              size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                           const SizedBox(width: 8),
                           Text('Edit',
                               style: GoogleFonts.inter(
-                                  fontSize: 13, color: AppColors.textPrimary)),
+                                  fontSize: 13, color: Theme.of(context).colorScheme.onSurface)),
                         ],
                       ),
                     ),
@@ -106,12 +103,12 @@ class SongCard extends StatelessWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          const Icon(Icons.delete_outline,
-                              size: 16, color: AppColors.rose),
+                          Icon(Icons.delete_outline,
+                              size: 16, color: Theme.of(context).colorScheme.error),
                           const SizedBox(width: 8),
                           Text('Delete',
                               style: GoogleFonts.inter(
-                                  fontSize: 13, color: AppColors.rose)),
+                                  fontSize: 13, color: Theme.of(context).colorScheme.error)),
                         ],
                       ),
                     ),
@@ -133,7 +130,7 @@ class SongCard extends StatelessWidget {
                       'No chords yet',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppColors.textMuted,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                       ),
                     ),
                   )
@@ -142,28 +139,28 @@ class SongCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     physics: const BouncingScrollPhysics(),
                     itemCount: song.chords.length,
-                    separatorBuilder: (_, __) => Padding(
+                    separatorBuilder: (_, _) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 10,
-                        color: AppColors.textMuted,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                       ),
                     ),
                     itemBuilder: (_, i) => Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceElevated,
+                        color: Theme.of(context).colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.surfaceBorder),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                       ),
                       child: Text(
                         song.chords[i],
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -179,7 +176,7 @@ class SongCard extends StatelessWidget {
                   '${song.chords.length} chord${song.chords.length == 1 ? '' : 's'}',
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                   ),
                 ),
                 const Spacer(),
@@ -208,22 +205,22 @@ class _TransposeButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.secondary.withOpacity(0.12),
+          color: Theme.of(context).colorScheme.secondary.withOpacity(0.12),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.secondary.withOpacity(0.35)),
+          border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.35)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.swap_vert_rounded,
-                color: AppColors.secondary, size: 14),
+            Icon(Icons.swap_vert_rounded,
+                color: Theme.of(context).colorScheme.secondary, size: 14),
             const SizedBox(width: 5),
             Text(
               'Transpose',
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: AppColors.secondary,
+                color: Theme.of(context).colorScheme.secondary,
               ),
             ),
           ],
@@ -236,17 +233,17 @@ class _TransposeButton extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.surfaceBorder),
+          side: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         ),
         title: Text(
           'Transpose',
           style: GoogleFonts.spaceGrotesk(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         content: Column(
@@ -256,7 +253,7 @@ class _TransposeButton extends StatelessWidget {
               'Shift all chords up or down by a half-step.',
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 20),
@@ -265,7 +262,7 @@ class _TransposeButton extends StatelessWidget {
                 Expanded(
                   child: _TransposeBtn(
                     label: '▼  Down ½',
-                    color: AppColors.teal,
+                    color: Theme.of(context).colorScheme.tertiary,
                     onTap: () {
                       Navigator.pop(ctx);
                       onTranspose(-1);
@@ -276,7 +273,7 @@ class _TransposeButton extends StatelessWidget {
                 Expanded(
                   child: _TransposeBtn(
                     label: '▲  Up ½',
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     onTap: () {
                       Navigator.pop(ctx);
                       onTranspose(1);

@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_detect_pitch/flutter_detect_pitch.dart';
 import 'package:google_fonts/google_fonts.dart';
 // Note: requested fftea package included for future manual FFT analysis.
-import 'package:fftea/fftea.dart'; 
+import 'package:fftea/fftea.dart';
 
-import 'package:theorypocket/app/theme.dart';
 
 class TunerPage extends StatefulWidget {
   const TunerPage({super.key});
@@ -90,8 +89,8 @@ class _TunerPageState extends State<TunerPage> {
 
   // ── UI Logic ───────────────────────────────────────────────────────────────
 
-  Color _getColorForOffset(int cents) {
-    if (cents == 0 && _currentFreq == 0) return AppColors.surfaceBorder;
+  Color _getColorForOffset(int cents, BuildContext context) {
+    if (cents == 0 && _currentFreq == 0) return Theme.of(context).colorScheme.outline.withOpacity(0.5);
     
     final absCents = cents.abs();
     
@@ -110,18 +109,18 @@ class _TunerPageState extends State<TunerPage> {
   @override
   Widget build(BuildContext context) {
     final pitch = _calculatePitch(_currentFreq);
-    final themeColor = _getColorForOffset(pitch.cents);
+    final themeColor = _getColorForOffset(pitch.cents, context);
 
     // Provide a smooth needle value
     final needleValue = (pitch.cents / 50.0).clamp(-1.0, 1.0); // -1.0 to 1.0
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: Theme.of(context).colorScheme.onSurface,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -135,7 +134,7 @@ class _TunerPageState extends State<TunerPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.queue_music_rounded),
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             tooltip: 'Alternate Tunings',
             onPressed: () {
               showModalBottomSheet(
@@ -158,7 +157,7 @@ class _TunerPageState extends State<TunerPage> {
               radius: 1.5,
               colors: [
                 themeColor.withOpacity(0.15),
-                AppColors.background,
+                Theme.of(context).colorScheme.surface,
               ],
             ),
           ),
@@ -180,6 +179,7 @@ class _TunerPageState extends State<TunerPage> {
                       painter: _TunerDialPainter(
                         needleValue: value,
                         color: themeColor,
+                        colorScheme: Theme.of(context).colorScheme,
                       ),
                     );
                   },
@@ -198,7 +198,7 @@ class _TunerPageState extends State<TunerPage> {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 120,
                       fontWeight: FontWeight.w800,
-                      color: pitch.freq > 0 ? themeColor : AppColors.textMuted,
+                      color: pitch.freq > 0 ? themeColor : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
                       height: 1.0,
                     ),
                   ),
@@ -225,12 +225,12 @@ class _TunerPageState extends State<TunerPage> {
                 decoration: BoxDecoration(
                   color: pitch.freq > 0 
                       ? themeColor.withOpacity(0.1) 
-                      : AppColors.surfaceElevated,
+                      : Theme.of(context).colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
                     color: pitch.freq > 0 
                         ? themeColor.withOpacity(0.3) 
-                        : AppColors.surfaceBorder,
+                        : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                   ),
                 ),
                 child: Text(
@@ -240,7 +240,7 @@ class _TunerPageState extends State<TunerPage> {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: pitch.freq > 0 ? themeColor : AppColors.textMuted,
+                    color: pitch.freq > 0 ? themeColor : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -254,7 +254,7 @@ class _TunerPageState extends State<TunerPage> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textMuted,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
               const SizedBox(height: 48),
@@ -287,10 +287,12 @@ class _PitchData {
 class _TunerDialPainter extends CustomPainter {
   final double needleValue; // -1 (flat) to +1 (sharp)
   final Color color;
+  final ColorScheme colorScheme;
 
   _TunerDialPainter({
     required this.needleValue,
     required this.color,
+    required this.colorScheme,
   });
 
   @override
@@ -301,7 +303,7 @@ class _TunerDialPainter extends CustomPainter {
 
     // Background track
     final trackPaint = Paint()
-      ..color = AppColors.surfaceElevated
+      ..color = colorScheme.surfaceContainerHigh
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6.0
       ..strokeCap = StrokeCap.round;
@@ -322,7 +324,7 @@ class _TunerDialPainter extends CustomPainter {
       
       final isMajor = i == 0 || i == -50 || i == 50;
       final length = isMajor ? 20.0 : 10.0;
-      final tColor = isMajor ? AppColors.textSecondary : AppColors.surfaceBorder;
+      final tColor = isMajor ? colorScheme.onSurfaceVariant : colorScheme.outline.withOpacity(0.5);
 
       final p1 = Offset(
         cx + (radius - length) * math.cos(angle),
@@ -369,7 +371,7 @@ class _TunerDialPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(cx, cy),
       6.0,
-      Paint()..color = AppColors.background,
+      Paint()..color = colorScheme.surface,
     );
   }
 
@@ -441,9 +443,9 @@ class _TuningsModalState extends State<_TuningsModal> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
@@ -453,7 +455,7 @@ class _TuningsModalState extends State<_TuningsModal> {
             width: 48,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.surfaceBorder,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -469,7 +471,7 @@ class _TuningsModalState extends State<_TuningsModal> {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -477,13 +479,13 @@ class _TuningsModalState extends State<_TuningsModal> {
                   // Search Bar
                   TextField(
                     onChanged: (val) => setState(() => _searchQuery = val),
-                    style: GoogleFonts.inter(color: AppColors.textPrimary),
+                    style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: 'Search tunings...',
-                      hintStyle: TextStyle(color: AppColors.textMuted),
-                      prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
+                      prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
                       filled: true,
-                      fillColor: AppColors.surfaceElevated,
+                      fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -497,7 +499,7 @@ class _TuningsModalState extends State<_TuningsModal> {
                   _FretboardVisualizer(tuning: _selectedTuning),
 
                   const SizedBox(height: 24),
-                  Divider(color: AppColors.surfaceBorder.withOpacity(0.5)),
+                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                   
                   // List of tunings
                   Expanded(
@@ -516,7 +518,7 @@ class _TuningsModalState extends State<_TuningsModal> {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   letterSpacing: 1.5,
                                 ),
                               ),
@@ -557,10 +559,10 @@ class _TuningTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+          color: isSelected ? Theme.of(context).colorScheme.surfaceContainerHigh : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.surfaceBorder.withOpacity(0.5),
+            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
           ),
         ),
         child: Row(
@@ -571,7 +573,7 @@ class _TuningTile extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? AppColors.primaryLight : AppColors.textPrimary,
+                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -580,13 +582,13 @@ class _TuningTile extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textMuted,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 letterSpacing: 1.0,
               ),
             ),
             const SizedBox(width: 8),
             if (isSelected) 
-              const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20)
+              Icon(Icons.check_circle_rounded, color: Theme.of(context).colorScheme.primary, size: 20)
             else
               const SizedBox(width: 20),
           ],
@@ -609,7 +611,7 @@ class _FretboardVisualizer extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A), // Dark wood-like tint
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.surfaceBorder),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -670,8 +672,8 @@ class _FretboardVisualizer extends StatelessWidget {
                           key: ValueKey<String>('\${strIndex}_\$noteStr'),
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.2),
-                            border: Border.all(color: AppColors.primary),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -679,7 +681,7 @@ class _FretboardVisualizer extends StatelessWidget {
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primaryLight,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             textAlign: TextAlign.center,
                           ),

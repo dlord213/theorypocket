@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 
 class GreetingHeader extends StatefulWidget {
   final String userName;
@@ -65,7 +64,7 @@ class _GreetingHeaderState extends State<GreetingHeader>
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                         height: 1.2,
                       ),
                     ),
@@ -75,7 +74,7 @@ class _GreetingHeaderState extends State<GreetingHeader>
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -95,15 +94,15 @@ class _GreetingHeaderState extends State<GreetingHeader>
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: AppColors.gradientPrimary,
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),

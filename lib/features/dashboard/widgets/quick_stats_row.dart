@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/shared/providers/app_state_provider.dart';
 
 class QuickStatsRow extends StatefulWidget {
@@ -45,7 +44,7 @@ class _QuickStatsRowState extends State<QuickStatsRow>
             sublabel: 'Explored',
             value: widget.stats.chordsExplored,
             icon: '🎸',
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
             delay: 0.0,
             controller: _controller,
           ),
@@ -55,7 +54,7 @@ class _QuickStatsRowState extends State<QuickStatsRow>
             sublabel: 'Learned',
             value: widget.stats.keysLearned,
             icon: '🎹',
-            color: AppColors.secondary,
+            color: Theme.of(context).colorScheme.secondary,
             delay: 0.15,
             controller: _controller,
           ),
@@ -65,7 +64,7 @@ class _QuickStatsRowState extends State<QuickStatsRow>
             sublabel: 'Saved',
             value: widget.stats.progressionsSaved,
             icon: '🎼',
-            color: AppColors.teal,
+            color: Theme.of(context).colorScheme.tertiary,
             delay: 0.3,
             controller: _controller,
           ),
@@ -112,9 +111,9 @@ class _StatTile extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.surfaceBorder),
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
               boxShadow: [
                 BoxShadow(
                   color: color.withOpacity(0.08),
@@ -148,14 +147,14 @@ class _StatTile extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 Text(
                   sublabel,
                   style: GoogleFonts.inter(
                     fontSize: 10,
-                    color: AppColors.textMuted,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

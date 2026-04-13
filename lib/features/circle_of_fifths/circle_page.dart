@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_data.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_painter.dart';
 import 'package:theorypocket/features/circle_of_fifths/circle_provider.dart';
@@ -18,19 +17,21 @@ class CirclePage extends ConsumerWidget {
     final selection = ref.watch(circleOfFifthsProvider);
     final notifier = ref.read(circleOfFifthsProvider.notifier);
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: colorScheme.onSurface,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: ShaderMask(
-          shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.textPrimary, AppColors.primaryLight],
-            stops: [0.4, 1.0],
+          shaderCallback: (b) => LinearGradient(
+            colors: [colorScheme.onSurface, colorScheme.primary],
+            stops: const [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Circle of Fifths',
@@ -51,7 +52,7 @@ class CirclePage extends ConsumerWidget {
                 'Clear',
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppColors.textMuted,
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
             ),
@@ -132,7 +133,10 @@ class _CircleWidget extends StatelessWidget {
         width: size,
         height: size,
         child: CustomPaint(
-          painter: CircleOfFifthsPainter(selection: selection),
+          painter: CircleOfFifthsPainter(
+            selection: selection,
+            colorScheme: Theme.of(context).colorScheme,
+          ),
         ),
       ),
     );
@@ -161,11 +165,13 @@ class _KeyBanner extends StatelessWidget {
         ? 'Relative major: ${majorKeys[selection.index]}'
         : 'Diminished chord';
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     final color = isMajor
-        ? AppColors.primary
+        ? colorScheme.primary
         : isMinor
-        ? AppColors.secondary
-        : AppColors.teal;
+        ? colorScheme.secondary
+        : colorScheme.tertiary;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
@@ -193,7 +199,7 @@ class _KeyBanner extends StatelessWidget {
                   subtitle,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -240,7 +246,9 @@ class _HintBanner extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             'Tap any segment to explore',
-            style: GoogleFonts.inter(fontSize: 13, color: AppColors.textMuted),
+            style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
           ),
         ],
       ),
@@ -260,6 +268,8 @@ class _DiatonicPanel extends StatelessWidget {
     final keyIndex = selection!.index;
     final chords = diatonicChords[keyIndex];
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -272,7 +282,7 @@ class _DiatonicPanel extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -281,7 +291,7 @@ class _DiatonicPanel extends StatelessWidget {
                 '— ${majorKeys[keyIndex]} Major',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppColors.textMuted,
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
             ],
@@ -294,14 +304,14 @@ class _DiatonicPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             physics: const BouncingScrollPhysics(),
             itemCount: 7,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, i) {
               final type = chordTypes[i];
               final Color chipColor = type == 0
-                  ? AppColors.primary
+                  ? colorScheme.primary
                   : type == 1
-                  ? AppColors.teal
-                  : AppColors.rose;
+                  ? colorScheme.secondary
+                  : colorScheme.error;
               return _ChordChip(
                 numeral: romanNumerals[i],
                 chord: chords[i],
@@ -318,19 +328,20 @@ class _DiatonicPanel extends StatelessWidget {
 class _EmptyPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Container(
         height: 78,
         decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.5),
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.surfaceBorder),
+          border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
         ),
         child: Center(
           child: Text(
             'Select a key to see its diatonic chords',
-            style: GoogleFonts.inter(fontSize: 13, color: AppColors.textMuted),
+            style: GoogleFonts.inter(fontSize: 13, color: colorScheme.onSurfaceVariant.withOpacity(0.8)),
           ),
         ),
       ),
@@ -377,7 +388,7 @@ class _ChordChip extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

@@ -2,7 +2,6 @@ import 'package:chord_diagrams/chord_diagrams.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/chord_dictionary/chord_provider.dart';
 import 'package:theorypocket/features/chord_dictionary/chord_theory.dart';
 
@@ -22,19 +21,21 @@ class ChordPage extends ConsumerWidget {
     final posCount = ChordDiagrams.getPositionCount(chordName);
     final safeVoicing = posCount > 0 ? voicingIdx.clamp(0, posCount - 1) : 0;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: colorScheme.onSurface,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: ShaderMask(
-          shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.textPrimary, AppColors.primaryLight],
-            stops: [0.4, 1.0],
+          shaderCallback: (b) => LinearGradient(
+            colors: [colorScheme.onSurface, colorScheme.primary],
+            stops: const [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Chord Dictionary',
@@ -133,32 +134,25 @@ class _NoteGrid extends StatelessWidget {
         final isSelected = note == selected;
         return GestureDetector(
           onTap: () => onSelect(note),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      colors: AppColors.gradientPrimary,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
-              color: isSelected ? null : AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected
-                    ? AppColors.primaryLight
-                    : AppColors.surfaceBorder,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              decoration: BoxDecoration(
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16), // Material 3 rounding
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.35),
+                          blurRadius: 12,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
             ),
             child: Center(
               child: Text(
@@ -166,7 +160,7 @@ class _NoteGrid extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -200,11 +194,11 @@ class _QualitySelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
             decoration: BoxDecoration(
               color: isSel
-                  ? AppColors.secondary.withOpacity(0.18)
-                  : AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
+                  ? Theme.of(context).colorScheme.secondary.withOpacity(0.18)
+                  : Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSel ? AppColors.secondary : AppColors.surfaceBorder,
+                color: isSel ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                 width: isSel ? 1.5 : 1,
               ),
             ),
@@ -213,7 +207,7 @@ class _QualitySelector extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: isSel ? FontWeight.w700 : FontWeight.w400,
-                color: isSel ? AppColors.secondary : AppColors.textSecondary,
+                color: isSel ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -243,14 +237,14 @@ class _ChordInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withOpacity(0.14),
-            AppColors.primaryDark.withOpacity(0.04),
+            Theme.of(context).colorScheme.primary.withOpacity(0.14),
+            Theme.of(context).colorScheme.primary.withOpacity(0.04),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withOpacity(0.28)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.28)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +261,7 @@ class _ChordInfoCard extends StatelessWidget {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 36,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       height: 1.0,
                     ),
                   ),
@@ -277,7 +271,7 @@ class _ChordInfoCard extends StatelessWidget {
                       description,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppColors.textMuted,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                       ),
                     ),
                   ],
@@ -290,7 +284,7 @@ class _ChordInfoCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          const Divider(color: AppColors.surfaceBorder, height: 1),
+          Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.5), height: 1),
           const SizedBox(height: 14),
 
           // Notes row
@@ -299,7 +293,7 @@ class _ChordInfoCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
               letterSpacing: 0.8,
             ),
           ),
@@ -317,13 +311,13 @@ class _ChordInfoCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isRoot
-                          ? AppColors.primary.withOpacity(0.22)
-                          : AppColors.surfaceElevated,
+                          ? Theme.of(context).colorScheme.primary.withOpacity(0.22)
+                          : Theme.of(context).colorScheme.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isRoot
-                            ? AppColors.primary.withOpacity(0.5)
-                            : AppColors.surfaceBorder,
+                            ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                            : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                       ),
                     ),
                     child: Text(
@@ -332,8 +326,8 @@ class _ChordInfoCard extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: isRoot
-                            ? AppColors.primaryLight
-                            : AppColors.textPrimary,
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -392,7 +386,7 @@ class _PlayButtonState extends State<_PlayButton>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 behavior: SnackBarBehavior.floating,
-                backgroundColor: AppColors.surfaceElevated,
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -405,7 +399,7 @@ class _PlayButtonState extends State<_PlayButton>
                       'Audio coming soon — add files manually',
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -419,23 +413,19 @@ class _PlayButtonState extends State<_PlayButton>
           width: 52,
           height: 52,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.secondary, Color(0xFFD97706)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: Theme.of(context).colorScheme.secondary,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.secondary.withOpacity(0.4),
+                color: Theme.of(context).colorScheme.secondary.withOpacity(0.4),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.play_arrow_rounded,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSecondary,
             size: 28,
           ),
         ),
@@ -475,7 +465,7 @@ class _DiagramSection extends StatelessWidget {
                 'Voicing ${voicingIdx + 1} / $posCount',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppColors.textMuted,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 8),
@@ -498,9 +488,9 @@ class _DiagramSection extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.surfaceBorder),
+            border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
           ),
           child: hasDiagram
               ? Center(
@@ -522,7 +512,7 @@ class _DiagramSection extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: AppColors.textMuted,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                         ),
                       ),
                     ],
@@ -553,14 +543,14 @@ class _VoicingArrow extends StatelessWidget {
         width: 28,
         height: 28,
         decoration: BoxDecoration(
-          color: enabled ? AppColors.surfaceElevated : AppColors.surface,
+          color: enabled ? Theme.of(context).colorScheme.surfaceContainerHigh : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.surfaceBorder),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.3)),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: enabled ? AppColors.textSecondary : AppColors.textMuted,
+          color: enabled ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
         ),
       ),
     );
@@ -580,7 +570,7 @@ class _SectionLabel extends StatelessWidget {
       style: GoogleFonts.spaceGrotesk(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }

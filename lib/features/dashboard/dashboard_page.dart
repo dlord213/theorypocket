@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:theorypocket/app/router.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/dashboard/widgets/daily_tip_card.dart';
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -51,8 +50,9 @@ class _DashboardPageState extends State<DashboardPage>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           // ── Background glows ─────────────────────────────────────────
@@ -63,7 +63,7 @@ class _DashboardPageState extends State<DashboardPage>
               SliverAppBar(
                 pinned: true,
                 expandedHeight: 0,
-                backgroundColor: AppColors.background.withOpacity(0.88),
+                backgroundColor: colorScheme.surface.withOpacity(0.88),
                 surfaceTintColor: Colors.transparent,
                 title: Row(
                   children: [
@@ -71,15 +71,15 @@ class _DashboardPageState extends State<DashboardPage>
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: AppColors.gradientPrimary,
+                        gradient: LinearGradient(
+                          colors: [colorScheme.primary, colorScheme.secondary],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(9),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.45),
+                            color: colorScheme.primary.withOpacity(0.45),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -89,9 +89,12 @@ class _DashboardPageState extends State<DashboardPage>
                     ),
                     const SizedBox(width: 10),
                     ShaderMask(
-                      shaderCallback: (b) => const LinearGradient(
-                        colors: [AppColors.textPrimary, AppColors.primaryLight],
-                        stops: [0.4, 1.0],
+                      shaderCallback: (b) => LinearGradient(
+                        colors: [
+                          colorScheme.onSurface,
+                          colorScheme.primaryContainer,
+                        ],
+                        stops: const [0.4, 1.0],
                       ).createShader(b),
                       child: Text(
                         'TheoryPocket',
@@ -137,7 +140,10 @@ class _DashboardPageState extends State<DashboardPage>
                               'Visualize key relationships & navigate tonality interactively',
                           emoji: '🎡',
                           badge: 'INTERACTIVE',
-                          gradientColors: AppColors.gradientCard1,
+                          gradientColors: [
+                            colorScheme.primary,
+                            colorScheme.secondary,
+                          ],
                           onTap: () => context.push(AppRoutes.circle),
                         ),
                       ),
@@ -159,7 +165,10 @@ class _DashboardPageState extends State<DashboardPage>
                                   title: 'Chord\nDictionary',
                                   subtitle: 'Lookup & hear any chord',
                                   emoji: '🎸',
-                                  gradientColors: AppColors.gradientCard2,
+                                  gradientColors: [
+                                    colorScheme.tertiary,
+                                    colorScheme.secondary,
+                                  ],
                                   onTap: () => context.push(AppRoutes.chords),
                                 ),
                               ),
@@ -169,7 +178,10 @@ class _DashboardPageState extends State<DashboardPage>
                                   title: 'Progression\nBuilder',
                                   subtitle: 'Compose & save sequences',
                                   emoji: '🎼',
-                                  gradientColors: AppColors.gradientCard3,
+                                  gradientColors: [
+                                    colorScheme.secondary,
+                                    colorScheme.primary,
+                                  ],
                                   onTap: () =>
                                       context.push(AppRoutes.progression),
                                 ),
@@ -265,9 +277,13 @@ class _MetronomeCardState extends State<_MetronomeCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 120));
-    _scale = Tween<double>(begin: 1.0, end: 0.97)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -333,7 +349,9 @@ class _MetronomeCardState extends State<_MetronomeCard>
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(13),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                          color: Colors.white.withOpacity(0.2),
+                          width: 0.5,
+                        ),
                       ),
                       child: const Icon(
                         Icons.access_time_rounded,
@@ -409,9 +427,13 @@ class _PolyrhythmCardState extends State<_PolyrhythmCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 120));
-    _scale = Tween<double>(begin: 1.0, end: 0.97)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -435,15 +457,18 @@ class _PolyrhythmCardState extends State<_PolyrhythmCard>
           height: 82,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.teal, Color(0xFF0369A1)], // Teal to deep cyan/blue
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.tertiary,
+                Theme.of(context).colorScheme.primary,
+              ], // Teal to deep cyan/blue
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.teal.withOpacity(0.32),
+                color: Theme.of(context).colorScheme.tertiary.withOpacity(0.32),
                 blurRadius: 20,
                 offset: const Offset(0, 6),
                 spreadRadius: -4,
@@ -477,7 +502,9 @@ class _PolyrhythmCardState extends State<_PolyrhythmCard>
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(13),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                          color: Colors.white.withOpacity(0.2),
+                          width: 0.5,
+                        ),
                       ),
                       child: const Icon(
                         Icons.blur_circular_rounded,
@@ -553,9 +580,13 @@ class _TunerCardState extends State<_TunerCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 120));
-    _scale = Tween<double>(begin: 1.0, end: 0.97)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -580,7 +611,10 @@ class _TunerCardState extends State<_TunerCard>
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFFEAB308), Color(0xFF10B981)], // Yellow to Emerald
+              colors: [
+                Color(0xFFEAB308),
+                Color(0xFF10B981),
+              ], // Yellow to Emerald
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -621,7 +655,9 @@ class _TunerCardState extends State<_TunerCard>
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(13),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.2), width: 0.5),
+                          color: Colors.white.withOpacity(0.2),
+                          width: 0.5,
+                        ),
                       ),
                       child: const Icon(
                         Icons.mic_external_on_rounded,
@@ -691,17 +727,29 @@ class _AmbientGlows extends StatelessWidget {
           Positioned(
             top: -90,
             left: -70,
-            child: _Blob(size: 300, color: AppColors.primary, opacity: 0.16),
+            child: _Blob(
+              size: 300,
+              color: Theme.of(context).colorScheme.primary,
+              opacity: 0.16,
+            ),
           ),
           Positioned(
             top: 130,
             right: -90,
-            child: _Blob(size: 240, color: AppColors.secondary, opacity: 0.10),
+            child: _Blob(
+              size: 240,
+              color: Theme.of(context).colorScheme.secondary,
+              opacity: 0.10,
+            ),
           ),
           Positioned(
             bottom: 200,
             left: -60,
-            child: _Blob(size: 200, color: AppColors.teal, opacity: 0.07),
+            child: _Blob(
+              size: 200,
+              color: Theme.of(context).colorScheme.tertiary,
+              opacity: 0.07,
+            ),
           ),
         ],
       ),
@@ -746,51 +794,12 @@ class _HeroBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Pill label
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.14),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.32),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryLight,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'MUSIC THEORY',
-                        style: GoogleFonts.inter(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primaryLight,
-                          letterSpacing: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
                 Text(
                   'Learn theory\nthe smart way.',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 27,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     height: 1.15,
                   ),
                 ),
@@ -799,7 +808,9 @@ class _HeroBanner extends StatelessWidget {
                   'Interactive tools for every musician.',
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppColors.textMuted,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withOpacity(0.8),
                     height: 1.4,
                   ),
                 ),
@@ -887,8 +898,11 @@ class _SectionHeader extends StatelessWidget {
             width: 3.5,
             height: 17,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: AppColors.gradientPrimary,
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary,
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -901,7 +915,7 @@ class _SectionHeader extends StatelessWidget {
             style: GoogleFonts.spaceGrotesk(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

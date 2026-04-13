@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:theorypocket/app/theme.dart';
 import 'package:theorypocket/features/progression_builder/models/song_model.dart';
 import 'package:theorypocket/features/progression_builder/providers/progression_provider.dart';
 
@@ -66,12 +65,12 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
     if (!editor.isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppColors.rose.withOpacity(0.9),
+          backgroundColor: Theme.of(context).colorScheme.error.withOpacity(0.9),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Text(
             'Add a title and at least one chord.',
-            style: GoogleFonts.inter(color: Colors.white),
+            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onError),
           ),
         ),
       );
@@ -109,11 +108,11 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
     final isEdit = widget.existing != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+          icon: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -121,7 +120,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
           style: GoogleFonts.spaceGrotesk(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         actions: [
@@ -135,7 +134,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: AppColors.gradientPrimary),
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -143,7 +142,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -164,27 +163,27 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
             TextField(
               controller: _titleCtrl,
               style: GoogleFonts.spaceGrotesk(
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
-              cursorColor: AppColors.primary,
+              cursorColor: Theme.of(context).colorScheme.primary,
               decoration: InputDecoration(
                 hintText: 'e.g. Autumn Leaves, My Song...',
-                hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 14),
+                hintStyle: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8), fontSize: 14),
                 filled: true,
-                fillColor: AppColors.surface,
+                fillColor: Theme.of(context).colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
@@ -204,18 +203,15 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: sel
-                          ? const LinearGradient(colors: AppColors.gradientPrimary)
-                          : null,
-                      color: sel ? null : AppColors.surface,
+                      color: sel ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: sel ? AppColors.primary : AppColors.surfaceBorder,
+                        color: sel ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                       ),
                       boxShadow: sel
                           ? [
                               BoxShadow(
-                                color: AppColors.primary.withOpacity(0.3),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                                 blurRadius: 10,
                                 offset: const Offset(0, 3),
                               )
@@ -227,7 +223,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: sel ? Colors.white : AppColors.textSecondary,
+                        color: sel ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -245,7 +241,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                     onTap: () => ref.read(editorProvider.notifier).clearChords(),
                     child: Text(
                       'Clear all',
-                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.rose),
+                      style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.error),
                     ),
                   ),
               ],
@@ -256,14 +252,14 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                 ? Container(
                     height: 56,
                     decoration: BoxDecoration(
-                      color: AppColors.surface.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.surfaceBorder),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
                     ),
                     child: Center(
                       child: Text(
                         'Pick chords below to build your progression',
-                        style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
+                        style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
                       ),
                     ),
                   )
@@ -294,7 +290,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
               'Root',
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: AppColors.textMuted,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 letterSpacing: 0.8,
               ),
             ),
@@ -304,7 +300,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _roots.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                separatorBuilder: (_, _) => const SizedBox(width: 6),
                 itemBuilder: (_, i) {
                   final r = _roots[i];
                   final sel = _selectedRoot == r;
@@ -314,10 +310,10 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                       duration: const Duration(milliseconds: 140),
                       width: 44,
                       decoration: BoxDecoration(
-                        color: sel ? AppColors.primary : AppColors.surface,
+                        color: sel ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: sel ? AppColors.primaryLight : AppColors.surfaceBorder,
+                          color: sel ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                         ),
                       ),
                       child: Center(
@@ -326,7 +322,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: sel ? Colors.white : AppColors.textSecondary,
+                            color: sel ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -342,7 +338,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
               'Quality',
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: AppColors.textMuted,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 letterSpacing: 0.8,
               ),
             ),
@@ -360,10 +356,10 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                     duration: const Duration(milliseconds: 140),
                     padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                     decoration: BoxDecoration(
-                      color: sel ? AppColors.teal.withOpacity(0.2) : AppColors.surface,
+                      color: sel ? Theme.of(context).colorScheme.tertiary.withOpacity(0.2) : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: sel ? AppColors.teal : AppColors.surfaceBorder,
+                        color: sel ? Theme.of(context).colorScheme.tertiary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                       ),
                     ),
                     child: Text(
@@ -371,7 +367,7 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: sel ? FontWeight.w700 : FontWeight.w400,
-                        color: sel ? AppColors.teal : AppColors.textSecondary,
+                        color: sel ? Theme.of(context).colorScheme.tertiary : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -389,13 +385,11 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryDark],
-                  ),
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.35),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.35),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -404,14 +398,14 @@ class _SongEditorPageState extends ConsumerState<SongEditorPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.add_rounded, color: Colors.white, size: 18),
+                    Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.onPrimary, size: 18),
                     const SizedBox(width: 6),
                     Text(
                       'Add  $_selectedRoot$_selectedQuality',
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ],
@@ -438,7 +432,7 @@ class _SectionLabel extends StatelessWidget {
       style: GoogleFonts.spaceGrotesk(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -461,11 +455,9 @@ class _ChordSequenceChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.surfaceElevated, AppColors.surface],
-          ),
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+          border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.35)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -475,16 +467,16 @@ class _ChordSequenceChip extends StatelessWidget {
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 4),
             GestureDetector(
               onTap: onRemove,
-              child: const Icon(
+              child: Icon(
                 Icons.close_rounded,
                 size: 14,
-                color: AppColors.textMuted,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
               ),
             ),
           ],

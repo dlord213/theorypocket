@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:theorypocket/app/theme.dart';
 
 class PolyrhythmPage extends StatefulWidget {
   const PolyrhythmPage({super.key});
@@ -106,22 +105,24 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          color: AppColors.textPrimary,
+          color: colorScheme.onSurface,
           onPressed: () {
             _sweepCtrl.stop();
             Navigator.of(context).pop();
           },
         ),
         title: ShaderMask(
-          shaderCallback: (b) => const LinearGradient(
-            colors: [AppColors.textPrimary, AppColors.teal],
-            stops: [0.4, 1.0],
+          shaderCallback: (b) => LinearGradient(
+            colors: [colorScheme.onSurface, colorScheme.tertiary],
+            stops: const [0.4, 1.0],
           ).createShader(b),
           child: Text(
             'Polyrhythms',
@@ -144,7 +145,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: colorScheme.onSurface,
                 letterSpacing: 1.2,
               ),
             ),
@@ -152,7 +153,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
               'Cycles per minute (CPM)',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: AppColors.textMuted,
+                color: colorScheme.onSurfaceVariant.withOpacity(0.8),
               ),
             ),
 
@@ -175,6 +176,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                             innerBeats: _innerBeats,
                             outerBeats: _outerBeats,
                             isPlaying: _isPlaying,
+                            colorScheme: colorScheme,
                           ),
                         ),
                       );
@@ -198,7 +200,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                       _LayerPicker(
                         label: 'Outer Layer',
                         value: _outerBeats,
-                        color: AppColors.teal,
+                        color: colorScheme.tertiary,
                         onChanged: (v) {
                           setState(() => _outerBeats = v.clamp(1, 16));
                           _lastOuterBeat = -1;
@@ -207,12 +209,12 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                       Container(
                         width: 1.5,
                         height: 48,
-                        color: AppColors.surfaceBorder,
+                        color: colorScheme.outline.withOpacity(0.5),
                       ),
                       _LayerPicker(
                         label: 'Inner Layer',
                         value: _innerBeats,
-                        color: AppColors.primary,
+                        color: colorScheme.primary,
                         onChanged: (v) {
                           setState(() => _innerBeats = v.clamp(1, 16));
                           _lastInnerBeat = -1;
@@ -240,7 +242,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 54,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: colorScheme.onSurface,
                               height: 1.0,
                             ),
                           ),
@@ -250,7 +252,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textMuted,
+                              color: colorScheme.onSurfaceVariant.withOpacity(0.8),
                               letterSpacing: 2,
                             ),
                           ),
@@ -269,10 +271,10 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                   // Slider
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppColors.teal,
-                      inactiveTrackColor: AppColors.surfaceBorder,
-                      thumbColor: Colors.white,
-                      overlayColor: AppColors.teal.withOpacity(0.14),
+                      activeTrackColor: colorScheme.tertiary,
+                      inactiveTrackColor: colorScheme.outline.withOpacity(0.5),
+                      thumbColor: colorScheme.onTertiary,
+                      overlayColor: colorScheme.tertiary.withOpacity(0.14),
                       trackHeight: 3,
                       thumbShape:
                           const RoundSliderThumbShape(enabledThumbRadius: 7),
@@ -310,12 +312,14 @@ class _PolyrhythmPainter extends CustomPainter {
   final int innerBeats;
   final int outerBeats;
   final bool isPlaying;
+  final ColorScheme colorScheme;
 
   _PolyrhythmPainter({
     required this.progress,
     required this.innerBeats,
     required this.outerBeats,
     required this.isPlaying,
+    required this.colorScheme,
   });
 
   @override
@@ -329,7 +333,7 @@ class _PolyrhythmPainter extends CustomPainter {
 
     // Draw base ring tracks
     final trackPaint = Paint()
-      ..color = AppColors.surfaceBorder
+      ..color = colorScheme.outline.withOpacity(0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -346,8 +350,8 @@ class _PolyrhythmPainter extends CustomPainter {
           startAngle: -math.pi / 2,
           endAngle: 2 * math.pi - math.pi / 2,
           colors: [
-            AppColors.teal.withOpacity(0.0),
-            AppColors.teal.withOpacity(0.2),
+            colorScheme.tertiary.withOpacity(0.0),
+            colorScheme.tertiary.withOpacity(0.2),
           ],
           stops: [progress == 0 ? 0.0 : progress - 0.2, progress],
           transform: GradientRotation(-math.pi / 2),
@@ -363,7 +367,7 @@ class _PolyrhythmPainter extends CustomPainter {
       
       // Radar line
       final linePaint = Paint()
-        ..color = AppColors.teal
+        ..color = colorScheme.tertiary
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       
@@ -395,7 +399,7 @@ class _PolyrhythmPainter extends CustomPainter {
       canvas.drawCircle(
         Offset(bx, by), 
         5.0, 
-        Paint()..color = AppColors.primary
+        Paint()..color = colorScheme.primary
       );
 
       // Pulse glow
@@ -403,7 +407,7 @@ class _PolyrhythmPainter extends CustomPainter {
         canvas.drawCircle(
           Offset(bx, by), 
           5.0 + (fade * 8.0), 
-          Paint()..color = AppColors.primaryLight.withOpacity(fade * 0.8)
+          Paint()..color = colorScheme.primaryContainer.withOpacity(fade * 0.8)
         );
       }
     }
@@ -421,7 +425,7 @@ class _PolyrhythmPainter extends CustomPainter {
       canvas.drawCircle(
         Offset(bx, by), 
         6.0, 
-        Paint()..color = AppColors.teal
+        Paint()..color = colorScheme.tertiary
       );
 
       // Pulse glow
@@ -429,7 +433,7 @@ class _PolyrhythmPainter extends CustomPainter {
         canvas.drawCircle(
           Offset(bx, by), 
           6.0 + (fade * 10.0), 
-          Paint()..color = AppColors.teal.withOpacity(fade * 0.8)
+          Paint()..color = colorScheme.tertiaryContainer.withOpacity(fade * 0.8)
         );
       }
     }
@@ -499,7 +503,7 @@ class _LayerPicker extends StatelessWidget {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -539,11 +543,11 @@ class _NudgeButton extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.surfaceElevated,
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.surfaceBorder),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
         ),
-        child: Icon(icon, color: AppColors.textSecondary, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
       ),
     );
   }
@@ -598,14 +602,14 @@ class _PlayStopButtonState extends State<_PlayStopButton>
             gradient: LinearGradient(
               colors: widget.isPlaying
                   ? [const Color(0xFFF43F5E), const Color(0xFFBE123C)]
-                  : [AppColors.teal, const Color(0xFF0D9488)],
+                  : [Theme.of(context).colorScheme.tertiary, const Color(0xFF0D9488)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: (widget.isPlaying ? AppColors.rose : AppColors.teal)
+                color: (widget.isPlaying ? const Color(0xFFF43F5E) : Theme.of(context).colorScheme.tertiary)
                     .withOpacity(0.40),
                 blurRadius: 22,
                 offset: const Offset(0, 6),

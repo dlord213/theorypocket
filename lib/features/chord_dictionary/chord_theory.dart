@@ -1,4 +1,5 @@
 /// Music theory helpers for computing chord note names.
+library;
 
 /// The chromatic scale used by chord_diagrams (matches getNotes() output).
 const List<String> chromaticScale = [
