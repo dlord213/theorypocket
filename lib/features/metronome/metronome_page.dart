@@ -19,7 +19,7 @@ class _MetronomePageState extends State<MetronomePage>
   double _bpm = 120;
   bool _isPlaying = false;
   Timer? _timer;
-  
+
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   // ── Tap tempo ──────────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ class _MetronomePageState extends State<MetronomePage>
     HapticFeedback.lightImpact();
     // Play a short synth beep for metronome tick
     _audioPlayer.play(AssetSource('sounds/high_beep.wav'));
-    
+
     _pulseCtrl.forward(from: 0);
     _glowCtrl.forward(from: 0);
     setState(() => _beatActive = true);

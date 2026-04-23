@@ -48,7 +48,6 @@ dependencies:
   path: ^1.9.1
   chord_diagrams: ^0.7.0
   fftea: ^1.5.0+1
-  flutter_detect_pitch: ^0.0.1+1
   audioplayers: ^6.6.0
 
 dev_dependencies:

@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_detect_pitch/flutter_detect_pitch.dart';
 import 'package:google_fonts/google_fonts.dart';
 // Note: requested fftea package included for future manual FFT analysis.
 import 'package:fftea/fftea.dart';
-
 
 class TunerPage extends StatefulWidget {
   const TunerPage({super.key});
@@ -38,47 +36,42 @@ class _TunerPageState extends State<TunerPage> {
 
   void _startListening() {
     setState(() => _isListening = true);
-    
-    // Fallback/Mock logic if the native microphone throws or isn't actually supported on current compilation
-    try {
-      _pitchSubscription = IosPitchDetector.pitchStream.listen(
-        (freq) {
-          if (mounted) {
-            setState(() => _currentFreq = freq);
-          }
-        },
-        onError: (err) {
-          debugPrint("Pitch detection error: \$err");
-        },
-      );
-    } catch (e) {
-      debugPrint("Failed to start pitch detection stream: \$e");
-    }
   }
 
   // ── Pitch Math ─────────────────────────────────────────────────────────────
 
   static const List<String> _noteNames = [
-    'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
+    'C',
+    'C#',
+    'D',
+    'D#',
+    'E',
+    'F',
+    'F#',
+    'G',
+    'G#',
+    'A',
+    'A#',
+    'B',
   ];
 
   _PitchData _calculatePitch(double frequency) {
     if (frequency <= 0) {
       return _PitchData(noteName: '--', octave: 0, cents: 0, freq: 0);
     }
-    
+
     // n = 12 * log2(f/440) + 69
     final double noteFull = 12 * (math.log(frequency / 440) / math.ln2) + 69;
     final int noteRounded = noteFull.round();
     final double cents = (noteFull - noteRounded) * 100;
-    
+
     final int pitchClass = noteRounded % 12;
     // MIDI note 12 = C0, so octave is floor(n / 12) - 1
     final int octave = (noteRounded / 12).floor() - 1;
 
     // Handle out of bounds safely
     final validClass = pitchClass < 0 ? 0 : pitchClass;
-    
+
     return _PitchData(
       noteName: _noteNames[validClass],
       octave: octave,
@@ -90,10 +83,11 @@ class _TunerPageState extends State<TunerPage> {
   // ── UI Logic ───────────────────────────────────────────────────────────────
 
   Color _getColorForOffset(int cents, BuildContext context) {
-    if (cents == 0 && _currentFreq == 0) return Theme.of(context).colorScheme.outline.withOpacity(0.5);
-    
+    if (cents == 0 && _currentFreq == 0)
+      return Theme.of(context).colorScheme.outline.withOpacity(0.5);
+
     final absCents = cents.abs();
-    
+
     if (absCents <= 5) {
       // Massive satisfying GREEN for perfect tune
       return const Color(0xFF10B981); // Emerald Green
@@ -165,7 +159,7 @@ class _TunerPageState extends State<TunerPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              
+
               // ── Dial Indicator ──────────────────────────────────────────────
               SizedBox(
                 height: 250,
@@ -198,7 +192,11 @@ class _TunerPageState extends State<TunerPage> {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 120,
                       fontWeight: FontWeight.w800,
-                      color: pitch.freq > 0 ? themeColor : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: pitch.freq > 0
+                          ? themeColor
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant.withOpacity(0.6),
                       height: 1.0,
                     ),
                   ),
@@ -221,26 +219,35 @@ class _TunerPageState extends State<TunerPage> {
 
               // ── Cents ─────────────────────────────────────────────────────
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: pitch.freq > 0 
-                      ? themeColor.withOpacity(0.1) 
+                  color: pitch.freq > 0
+                      ? themeColor.withOpacity(0.1)
                       : Theme.of(context).colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: pitch.freq > 0 
-                        ? themeColor.withOpacity(0.3) 
-                        : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                    color: pitch.freq > 0
+                        ? themeColor.withOpacity(0.3)
+                        : Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.5),
                   ),
                 ),
                 child: Text(
-                  pitch.freq > 0 
+                  pitch.freq > 0
                       ? '${pitch.cents > 0 ? '+' : ''}${pitch.cents} cents'
                       : 'Waiting for sound...',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: pitch.freq > 0 ? themeColor : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: pitch.freq > 0
+                        ? themeColor
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withOpacity(0.6),
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -254,7 +261,9 @@ class _TunerPageState extends State<TunerPage> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
               const SizedBox(height: 48),
@@ -314,17 +323,18 @@ class _TunerDialPainter extends CustomPainter {
     const startAngle = -math.pi / 2 - math.pi / 3;
     const sweepAngle = (2 * math.pi) / 3;
 
-
     canvas.drawArc(rect, startAngle, sweepAngle, false, trackPaint);
 
     // Draw little tick marks
     for (int i = -50; i <= 50; i += 10) {
       final valFrac = i / 50.0;
       final angle = -math.pi / 2 + (valFrac * math.pi / 3);
-      
+
       final isMajor = i == 0 || i == -50 || i == 50;
       final length = isMajor ? 20.0 : 10.0;
-      final tColor = isMajor ? colorScheme.onSurfaceVariant : colorScheme.outline.withOpacity(0.5);
+      final tColor = isMajor
+          ? colorScheme.onSurfaceVariant
+          : colorScheme.outline.withOpacity(0.5);
 
       final p1 = Offset(
         cx + (radius - length) * math.cos(angle),
@@ -336,12 +346,12 @@ class _TunerDialPainter extends CustomPainter {
       );
 
       canvas.drawLine(
-        p1, 
-        p2, 
+        p1,
+        p2,
         Paint()
           ..color = tColor
           ..strokeWidth = isMajor ? 3.0 : 2.0
-          ..strokeCap = StrokeCap.round
+          ..strokeCap = StrokeCap.round,
       );
     }
 
@@ -363,11 +373,7 @@ class _TunerDialPainter extends CustomPainter {
     );
 
     // Pivot dot
-    canvas.drawCircle(
-      Offset(cx, cy),
-      12.0,
-      Paint()..color = color,
-    );
+    canvas.drawCircle(Offset(cx, cy), 12.0, Paint()..color = color);
     canvas.drawCircle(
       Offset(cx, cy),
       6.0,
@@ -397,23 +403,83 @@ class GuitarTuning {
 
 const List<GuitarTuning> _guitarTunings = [
   // Standard & Drops
-  GuitarTuning(name: 'Standard E', category: 'Standard & Drop', notes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']),
-  GuitarTuning(name: 'Drop D', category: 'Standard & Drop', notes: ['D2', 'A2', 'D3', 'G3', 'B3', 'E4']),
-  GuitarTuning(name: 'Drop C', category: 'Standard & Drop', notes: ['C2', 'G2', 'C3', 'F3', 'A3', 'D4']),
-  GuitarTuning(name: 'Drop B', category: 'Standard & Drop', notes: ['B1', 'F#2', 'B2', 'E3', 'G#3', 'C#4']),
-  GuitarTuning(name: 'D Standard', category: 'Standard & Drop', notes: ['D2', 'G2', 'C3', 'F3', 'A3', 'D4']),
-  GuitarTuning(name: 'Eb Standard', category: 'Standard & Drop', notes: ['D#2', 'G#2', 'C#3', 'F#3', 'A#3', 'D#4']),
+  GuitarTuning(
+    name: 'Standard E',
+    category: 'Standard & Drop',
+    notes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+  ),
+  GuitarTuning(
+    name: 'Drop D',
+    category: 'Standard & Drop',
+    notes: ['D2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+  ),
+  GuitarTuning(
+    name: 'Drop C',
+    category: 'Standard & Drop',
+    notes: ['C2', 'G2', 'C3', 'F3', 'A3', 'D4'],
+  ),
+  GuitarTuning(
+    name: 'Drop B',
+    category: 'Standard & Drop',
+    notes: ['B1', 'F#2', 'B2', 'E3', 'G#3', 'C#4'],
+  ),
+  GuitarTuning(
+    name: 'D Standard',
+    category: 'Standard & Drop',
+    notes: ['D2', 'G2', 'C3', 'F3', 'A3', 'D4'],
+  ),
+  GuitarTuning(
+    name: 'Eb Standard',
+    category: 'Standard & Drop',
+    notes: ['D#2', 'G#2', 'C#3', 'F#3', 'A#3', 'D#4'],
+  ),
   // Open
-  GuitarTuning(name: 'Open D', category: 'Open', notes: ['D2', 'A2', 'D3', 'F#3', 'A3', 'D4']),
-  GuitarTuning(name: 'Open G', category: 'Open', notes: ['D2', 'G2', 'D3', 'G3', 'B3', 'D4']),
-  GuitarTuning(name: 'Open C', category: 'Open', notes: ['C2', 'G2', 'C3', 'G3', 'C4', 'E4']),
-  GuitarTuning(name: 'Open E', category: 'Open', notes: ['E2', 'B2', 'E3', 'G#3', 'B3', 'E4']),
-  GuitarTuning(name: 'Open A', category: 'Open', notes: ['E2', 'A2', 'C#3', 'E3', 'A3', 'E4']),
+  GuitarTuning(
+    name: 'Open D',
+    category: 'Open',
+    notes: ['D2', 'A2', 'D3', 'F#3', 'A3', 'D4'],
+  ),
+  GuitarTuning(
+    name: 'Open G',
+    category: 'Open',
+    notes: ['D2', 'G2', 'D3', 'G3', 'B3', 'D4'],
+  ),
+  GuitarTuning(
+    name: 'Open C',
+    category: 'Open',
+    notes: ['C2', 'G2', 'C3', 'G3', 'C4', 'E4'],
+  ),
+  GuitarTuning(
+    name: 'Open E',
+    category: 'Open',
+    notes: ['E2', 'B2', 'E3', 'G#3', 'B3', 'E4'],
+  ),
+  GuitarTuning(
+    name: 'Open A',
+    category: 'Open',
+    notes: ['E2', 'A2', 'C#3', 'E3', 'A3', 'E4'],
+  ),
   // Modal & Others
-  GuitarTuning(name: 'DADGAD', category: 'Modal', notes: ['D2', 'A2', 'D3', 'G3', 'A3', 'D4']),
-  GuitarTuning(name: 'DADDAD', category: 'Modal', notes: ['D2', 'A2', 'D3', 'D4', 'A4', 'D5']),
-  GuitarTuning(name: 'CGCGCE', category: 'Modal', notes: ['C2', 'G2', 'C3', 'G3', 'C4', 'E4']),
-  GuitarTuning(name: 'All Fourths', category: 'Modal', notes: ['E2', 'A2', 'D3', 'G3', 'C4', 'F4']),
+  GuitarTuning(
+    name: 'DADGAD',
+    category: 'Modal',
+    notes: ['D2', 'A2', 'D3', 'G3', 'A3', 'D4'],
+  ),
+  GuitarTuning(
+    name: 'DADDAD',
+    category: 'Modal',
+    notes: ['D2', 'A2', 'D3', 'D4', 'A4', 'D5'],
+  ),
+  GuitarTuning(
+    name: 'CGCGCE',
+    category: 'Modal',
+    notes: ['C2', 'G2', 'C3', 'G3', 'C4', 'E4'],
+  ),
+  GuitarTuning(
+    name: 'All Fourths',
+    category: 'Modal',
+    notes: ['E2', 'A2', 'D3', 'G3', 'C4', 'F4'],
+  ),
 ];
 
 // ── Alternate Tunings UI ─────────────────────────────────────────────────────
@@ -459,7 +525,7 @@ class _TuningsModalState extends State<_TuningsModal> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -475,17 +541,30 @@ class _TuningsModalState extends State<_TuningsModal> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Search Bar
                   TextField(
                     onChanged: (val) => setState(() => _searchQuery = val),
-                    style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface),
+                    style: GoogleFonts.inter(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Search tunings...',
-                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
-                      prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8)),
+                      hintStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                      ),
                       filled: true,
-                      fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+                      fillColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHigh,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -499,8 +578,12 @@ class _TuningsModalState extends State<_TuningsModal> {
                   _FretboardVisualizer(tuning: _selectedTuning),
 
                   const SizedBox(height: 24),
-                  Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
-                  
+                  Divider(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withOpacity(0.5),
+                  ),
+
                   // List of tunings
                   Expanded(
                     child: ListView.builder(
@@ -523,11 +606,14 @@ class _TuningsModalState extends State<_TuningsModal> {
                                 ),
                               ),
                             ),
-                            ...tunings.map((t) => _TuningTile(
-                                  tuning: t,
-                                  isSelected: _selectedTuning == t,
-                                  onTap: () => setState(() => _selectedTuning = t),
-                                )),
+                            ...tunings.map(
+                              (t) => _TuningTile(
+                                tuning: t,
+                                isSelected: _selectedTuning == t,
+                                onTap: () =>
+                                    setState(() => _selectedTuning = t),
+                              ),
+                            ),
                           ],
                         );
                       },
@@ -548,7 +634,11 @@ class _TuningTile extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _TuningTile({required this.tuning, required this.isSelected, required this.onTap});
+  const _TuningTile({
+    required this.tuning,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -559,10 +649,14 @@ class _TuningTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.surfaceContainerHigh : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).colorScheme.surfaceContainerHigh
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline.withOpacity(0.5),
           ),
         ),
         child: Row(
@@ -573,7 +667,9 @@ class _TuningTile extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -582,13 +678,19 @@ class _TuningTile extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 letterSpacing: 1.0,
               ),
             ),
             const SizedBox(width: 8),
-            if (isSelected) 
-              Icon(Icons.check_circle_rounded, color: Theme.of(context).colorScheme.primary, size: 20)
+            if (isSelected)
+              Icon(
+                Icons.check_circle_rounded,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              )
             else
               const SizedBox(width: 20),
           ],
@@ -611,7 +713,9 @@ class _FretboardVisualizer extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A), // Dark wood-like tint
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+        ),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -635,7 +739,7 @@ class _FretboardVisualizer extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Fret wires (decorative)
           for (int i = 1; i <= 3; i++)
             Positioned(
@@ -655,7 +759,8 @@ class _FretboardVisualizer extends StatelessWidget {
               // Usually the list is Low E to High E.
               // To display them like reading tabs (high string on top), we reverse the logic.
               final strIndex = 5 - index;
-              final strWeight = 1.0 + (strIndex * 0.6); // Lower strings are thicker
+              final strWeight =
+                  1.0 + (strIndex * 0.6); // Lower strings are thicker
               final noteStr = tuning.notes[strIndex];
 
               return Expanded(
@@ -667,13 +772,21 @@ class _FretboardVisualizer extends StatelessWidget {
                       margin: const EdgeInsets.only(left: 36),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (w, anim) => ScaleTransition(scale: anim, child: w),
+                        transitionBuilder: (w, anim) =>
+                            ScaleTransition(scale: anim, child: w),
                         child: Container(
                           key: ValueKey<String>('\${strIndex}_\$noteStr'),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                            border: Border.all(color: Theme.of(context).colorScheme.primary),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.2),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -688,7 +801,7 @@ class _FretboardVisualizer extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     // The String
                     Expanded(
                       child: Stack(
@@ -703,7 +816,7 @@ class _FretboardVisualizer extends StatelessWidget {
                             height: strWeight,
                             margin: const EdgeInsets.only(top: 1.5),
                             color: Colors.black.withOpacity(0.5),
-                          )
+                          ),
                         ],
                       ),
                     ),

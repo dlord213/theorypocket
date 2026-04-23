@@ -227,18 +227,18 @@ class _DashboardPageState extends State<DashboardPage>
                     const SizedBox(height: 12),
 
                     // Tuner — full-width compact card
-                    FadeTransition(
-                      opacity: _fade(0.75, 1.0),
-                      child: SlideTransition(
-                        position: _slide(0.75, 1.0),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: _TunerCard(
-                            onTap: () => context.push(AppRoutes.tuner),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // FadeTransition(
+                    //   opacity: _fade(0.75, 1.0),
+                    //   child: SlideTransition(
+                    //     position: _slide(0.75, 1.0),
+                    //     child: Padding(
+                    //       padding: const EdgeInsets.symmetric(horizontal: 20),
+                    //       child: _TunerCard(
+                    //         onTap: () => context.push(AppRoutes.tuner),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ]),
                 ),
               ),
