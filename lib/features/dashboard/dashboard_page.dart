@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import 'package:theorypocket/app/router.dart';
 import 'package:theorypocket/features/dashboard/widgets/daily_tip_card.dart';
 
@@ -70,22 +70,16 @@ class _DashboardPageState extends State<DashboardPage>
                     Container(
                       width: 32,
                       height: 32,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [colorScheme.primary, colorScheme.secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(9),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.45),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                      child: Center(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(9),
+                          child: Image.asset(
+                            'assets/icon/icon.png',
+                            width: 32,
+                            height: 32,
                           ),
-                        ],
+                        ),
                       ),
-                      child: const Center(child: Icon(LucideIcons.music)),
                     ),
                     const SizedBox(width: 10),
                     ShaderMask(
@@ -188,6 +182,72 @@ class _DashboardPageState extends State<DashboardPage>
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // New Learning Features Section
+                    FadeTransition(
+                      opacity: _fade(0.50, 0.88),
+                      child: SlideTransition(
+                        position: _slide(0.50, 0.88),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _CompactCard(
+                                  title: 'Scale\nFormula',
+                                  subtitle: 'Build scales mathematically',
+                                  emoji: '📏',
+                                  gradientColors: [
+                                    colorScheme.error,
+                                    colorScheme.primary,
+                                  ],
+                                  onTap: () =>
+                                      context.push(AppRoutes.scaleFormula),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _CompactCard(
+                                  title: 'Spelling\nBee',
+                                  subtitle: 'Actively build chords',
+                                  emoji: '🐝',
+                                  gradientColors: [
+                                    colorScheme.secondary,
+                                    colorScheme.error,
+                                  ],
+                                  onTap: () =>
+                                      context.push(AppRoutes.chordSpelling),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Analyzer
+                    FadeTransition(
+                      opacity: _fade(0.52, 0.89),
+                      child: SlideTransition(
+                        position: _slide(0.52, 0.89),
+                        child: _HeroFeatureCard(
+                          title: 'Why Does This Work?',
+                          subtitle: 'Functional analysis for any progression',
+                          emoji: '🧠',
+                          badge: 'ANALYZER',
+                          gradientColors: [
+                            colorScheme.onSurface,
+                            colorScheme.primaryContainer,
+                          ],
+                          onTap: () =>
+                              context.push(AppRoutes.progressionAnalyzer),
                         ),
                       ),
                     ),
@@ -787,7 +847,7 @@ class _HeroBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Learn theory\nthe smart way.',
+                  "Learn more about music theory.",
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 27,
                     fontWeight: FontWeight.w800,

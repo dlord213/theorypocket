@@ -7,6 +7,9 @@ import 'package:theorypocket/features/metronome/metronome_page.dart';
 import 'package:theorypocket/features/polyrhythm/polyrhythm_page.dart';
 import 'package:theorypocket/features/progression_builder/progression_page.dart';
 import 'package:theorypocket/features/tuner/tuner_page.dart';
+import 'package:theorypocket/features/scale_constructor/scale_constructor_page.dart';
+import 'package:theorypocket/features/spelling_bee/spelling_bee_page.dart';
+import 'package:theorypocket/features/progression_analyzer/progression_analyzer_page.dart';
 
 class AppRoutes {
   static const String dashboard = '/';
@@ -16,6 +19,9 @@ class AppRoutes {
   static const String metronome = '/metronome';
   static const String polyrhythm = '/polyrhythm';
   static const String tuner = '/tuner';
+  static const String scaleFormula = '/scale-formula';
+  static const String chordSpelling = '/chord-spelling';
+  static const String progressionAnalyzer = '/progression-analyzer';
 }
 
 final goRouter = GoRouter(
@@ -83,6 +89,33 @@ final goRouter = GoRouter(
         context,
         state,
         const TunerPage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.scaleFormula,
+      name: 'scaleFormula',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const ScaleConstructorPage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.chordSpelling,
+      name: 'chordSpelling',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const SpellingBeePage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.progressionAnalyzer,
+      name: 'progressionAnalyzer',
+      pageBuilder: (context, state) => _buildPage(
+        context,
+        state,
+        const ProgressionAnalyzerPage(),
       ),
     ),
   ],
