@@ -21,6 +21,15 @@
 - 🥁 **Polyrhythm Generator**  
   A specialized tool to layer different time signatures simultaneously (e.g., 3 against 4). Built with distinct concentric visualizations that pulse upon hitting overlapping beats.
 
+- 📏 **Scale Formula Constructor**  
+  An interactive tool teaching the underlying step math of scales. Users arrange Whole Step (W) and Half Step (H) blocks to build standard sequences (e.g., Major: W-W-H-W-W-W-H), which visually animates onto a dynamic fretboard and piano keyboard.
+
+- 🐝 **Chord Spelling Bee**  
+  A gamified, algorithmic tutor challenging you to spell chords from scratch on a live 12-note chromatic keyboard. Receive active pedagogical feedback when intervals mismatch.
+
+- 🧠 **Progression Analyzer ("Why Does This Work?")**  
+  Input any chord sequence and the analyzer evaluates its functional harmony in real-time, mapping Roman Numerals and explaining complex resolutions like Secondary Dominants and Minor Plagal Cadences.
+
 ---
 
 ## 🎨 Design System
