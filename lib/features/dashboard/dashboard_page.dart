@@ -6,17 +6,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:theorypocket/app/router.dart';
 import 'package:theorypocket/features/dashboard/widgets/daily_tip_card.dart';
+import 'package:theorypocket/app/theme.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
+class _DashboardPageState extends ConsumerState<DashboardPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _entry;
 
@@ -101,6 +103,20 @@ class _DashboardPageState extends State<DashboardPage>
                     ),
                   ],
                 ),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      ref.watch(themeModeProvider) == ThemeMode.dark 
+                          ? Icons.light_mode 
+                          : Icons.dark_mode,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: () {
+                      ref.read(themeModeProvider.notifier).toggle();
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
 
               // ── Body ──────────────────────────────────────────────────

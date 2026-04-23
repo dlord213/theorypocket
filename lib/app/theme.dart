@@ -1,5 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() => ThemeMode.system;
+
+  void toggle() {
+    if (state == ThemeMode.system) {
+      // If system is dark, switch to light, else dark
+      // For simplicity, cycle to dark first if currently system
+      state = ThemeMode.dark;
+    } else {
+      state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    }
+  }
+}
+
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
+  ThemeModeNotifier.new,
+);
 
 class AppTheme {
   static const primaryLime = Color(0xFFA3E635);
