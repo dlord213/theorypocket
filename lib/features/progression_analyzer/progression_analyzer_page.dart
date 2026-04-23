@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'harmonic_analyzer.dart';
+
 class ProgressionAnalyzerPage extends StatefulWidget {
   const ProgressionAnalyzerPage({super.key});
 
@@ -10,49 +12,23 @@ class ProgressionAnalyzerPage extends StatefulWidget {
 }
 
 class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
-  final List<String> _sequence = [];
-  bool _analyzing = false;
+  final List<Chord> _sequence = [];
+  List<ChordAnalysisResult>? _results;
   
-  // Available chords for the prototype (G Major context + borrowed chords)
-  final List<String> _availableChords = ['G', 'Am', 'Bm', 'B', 'B7', 'C', 'Cm', 'D', 'Em', 'F', 'F#m7b5'];
+  Note _selectedKey = Note.c; // Default Key C Major
+  Note _currentRoot = Note.c;
+  ChordQuality _currentQuality = ChordQuality.major;
 
-  // Analysis Engine logic mocked for the scope
-  Map<String, String> _analyzeChord(String chord) {
-    switch (chord) {
-      case 'G':
-        return {'numeral': 'I', 'desc': 'Standard diatonic tonic chord. Establishes the key.'};
-      case 'Am':
-        return {'numeral': 'ii', 'desc': 'Standard diatonic supertonic. Often leads to V.'};
-      case 'Bm':
-        return {'numeral': 'iii', 'desc': 'Standard diatonic mediant.'};
-      case 'B':
-      case 'B7':
-        return {'numeral': 'V/vi', 'desc': 'Secondary Dominant: This is the V chord of the vi chord (Em), creating tension.'};
-      case 'C':
-        return {'numeral': 'IV', 'desc': 'Standard diatonic subdominant. A bright, stable resting point.'};
-      case 'Cm':
-        return {'numeral': 'iv', 'desc': 'Minor Plagal Cadence: Borrowed from the parallel minor (G minor) to create a melancholic resolution.'};
-      case 'D':
-        return {'numeral': 'V', 'desc': 'Standard diatonic dominant. Strongest pull back to the tonic.'};
-      case 'Em':
-        return {'numeral': 'vi', 'desc': 'Standard diatonic submediant. The relative minor.'};
-      case 'F':
-        return {'numeral': 'bVII', 'desc': 'Borrowed Chord: Taken from the Mixolydian mode or parallel minor for a rocky feel.'};
-      default:
-        return {'numeral': '?', 'desc': 'Unanalyzed chord.'};
-    }
-  }
-
-  void _addChord(String chord) {
-    if (_sequence.length < 6 && !_analyzing) {
+  void _addChord() {
+    if (_results == null) {
       setState(() {
-        _sequence.add(chord);
+        _sequence.add(Chord(_currentRoot, _currentQuality));
       });
     }
   }
 
   void _removeLast() {
-    if (_sequence.isNotEmpty && !_analyzing) {
+    if (_sequence.isNotEmpty && _results == null) {
       setState(() {
         _sequence.removeLast();
       });
@@ -62,7 +38,7 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
   void _runAnalysis() {
     if (_sequence.isNotEmpty) {
       setState(() {
-        _analyzing = true;
+        _results = HarmonicAnalyzer.analyzeProgression(_selectedKey, _sequence);
       });
     }
   }
@@ -70,7 +46,7 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
   void _reset() {
     setState(() {
       _sequence.clear();
-      _analyzing = false;
+      _results = null;
     });
   }
 
@@ -119,18 +95,47 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              Text(
-                'Input a progression (Key: G Major) to see its functional analysis.',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
+              
+              // Key Selector
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Anchor Key:',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  DropdownButton<Note>(
+                    value: _selectedKey,
+                    dropdownColor: colorScheme.surfaceContainerHigh,
+                    underline: Container(),
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.primary,
+                    ),
+                    items: Note.values.map((n) {
+                      return DropdownMenuItem(
+                        value: n,
+                        child: Text('${n.label} Major'),
+                      );
+                    }).toList(),
+                    onChanged: _results == null ? (Note? value) {
+                      if (value != null) {
+                        setState(() => _selectedKey = value);
+                      }
+                    } : null, // Disable key change during analysis result view
+                  ),
+                ],
               ),
               
               const SizedBox(height: 24),
               
-              // Sequence Display
+              // Sequence Display (Responsive horizontally scrolling list)
               Container(
                 height: 80,
                 decoration: BoxDecoration(
@@ -138,42 +143,45 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: _sequence.isEmpty 
-                    ? [
-                        Text(
-                          'Tap chords below to build sequence',
-                          style: GoogleFonts.inter(
-                            color: colorScheme.onSurfaceVariant.withOpacity(0.6),
-                            fontStyle: FontStyle.italic,
-                          ),
-                        )
-                      ]
-                    : _sequence.map((c) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            c,
-                            style: GoogleFonts.spaceGrotesk(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                alignment: Alignment.center,
+                child: _sequence.isEmpty 
+                  ? Text(
+                      'Build a sequence below',
+                      style: GoogleFonts.inter(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      child: Row(
+                        children: _sequence.map((c) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              c.name,
+                              style: GoogleFonts.spaceGrotesk(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        ),
-                      )).toList(),
-                ),
+                        )).toList(),
+                      ),
+                    ),
               ),
               
               const SizedBox(height: 16),
               
-              if (!_analyzing) ...[
+              if (_results == null) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -190,55 +198,96 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 
-                // Keyboard / Chord Picker Area
+                // Active Chord Builder Area
                 Expanded(
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      childAspectRatio: 1.5,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainer,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Select Root Note',
+                            style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: Note.values.map((n) {
+                              final isSelected = _currentRoot == n;
+                              return ChoiceChip(
+                                label: Text(n.label),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _currentRoot = n),
+                                selectedColor: colorScheme.secondary,
+                                labelStyle: TextStyle(
+                                  color: isSelected ? colorScheme.onSecondary : colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Select Chord Quality',
+                            style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: ChordQuality.values.map((q) {
+                              final isSelected = _currentQuality == q;
+                              // A user-friendly string for the quality name
+                              String qName = q.name.toUpperCase();
+                              if (q == ChordQuality.dom7) qName = 'DOMINANT 7';
+                              if (q == ChordQuality.maj7) qName = 'MAJOR 7';
+                              if (q == ChordQuality.min7) qName = 'MINOR 7';
+                              
+                              return ChoiceChip(
+                                label: Text(qName),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _currentQuality = q),
+                                selectedColor: colorScheme.tertiary,
+                                labelStyle: TextStyle(
+                                  color: isSelected ? colorScheme.onTertiary : colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 32),
+                          OutlinedButton.icon(
+                            onPressed: _addChord, 
+                            icon: const Icon(Icons.add),
+                            label: Text('Add ${_currentRoot.label}${_currentQuality.symbol}'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              side: BorderSide(color: colorScheme.primary, width: 2),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    itemCount: _availableChords.length,
-                    itemBuilder: (context, index) {
-                      final chord = _availableChords[index];
-                      // Highlight common borrowed chords slightly differently
-                      final isBorrowed = ['B', 'B7', 'Cm', 'F'].contains(chord);
-                      return InkWell(
-                        onTap: () => _addChord(chord),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isBorrowed ? colorScheme.tertiaryContainer : colorScheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isBorrowed ? colorScheme.tertiary : colorScheme.outline.withOpacity(0.5),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            chord,
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              color: isBorrowed ? colorScheme.onTertiaryContainer : colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 ),
               ] else ...[
                 // Analysis Results
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _sequence.length,
+                    itemCount: _results!.length,
                     itemBuilder: (context, index) {
-                      final chord = _sequence[index];
-                      final analysis = _analyzeChord(chord);
-                      final isSpecial = ['iv', 'V/vi', 'bVII'].contains(analysis['numeral']);
+                      final result = _results![index];
+                      // Highlight non-diatonic chords as special
+                      final isSpecial = result.tag != AnalysisTag.diatonic;
                       
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -261,21 +310,22 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: 60,
+                              width: 65,
                               alignment: Alignment.center,
                               child: Column(
                                 children: [
                                   Text(
-                                    chord,
+                                    result.chord.name,
                                     style: GoogleFonts.spaceGrotesk(
-                                      fontSize: 24,
+                                      fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       color: isSpecial ? colorScheme.onTertiaryContainer : colorScheme.onSurface,
                                     ),
                                   ),
                                   Text(
-                                    analysis['numeral']!,
+                                    result.romanNumeral,
                                     style: GoogleFonts.inter(
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w800,
                                       color: isSpecial ? colorScheme.tertiary : colorScheme.primary,
                                     ),
@@ -299,7 +349,7 @@ class _ProgressionAnalyzerPageState extends State<ProgressionAnalyzerPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    analysis['desc']!,
+                                    result.pedagogyExplanation,
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       height: 1.4,
