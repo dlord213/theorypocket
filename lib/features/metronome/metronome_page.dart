@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,14 +19,16 @@ class _MetronomePageState extends State<MetronomePage>
   double _bpm = 120;
   bool _isPlaying = false;
   Timer? _timer;
+  
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   // ── Tap tempo ──────────────────────────────────────────────────────────────
   final List<DateTime> _tapTimes = [];
   static const int _maxTaps = 8;
 
   // ── Animations ─────────────────────────────────────────────────────────────
-  late AnimationController _pulseCtrl;   // outer ring pulse on beat
-  late AnimationController _glowCtrl;    // glow fade on beat
+  late AnimationController _pulseCtrl; // outer ring pulse on beat
+  late AnimationController _glowCtrl; // glow fade on beat
   late AnimationController _pendulumCtrl; // pendulum swing left-right
   late Animation<double> _pulseAnim;
   late Animation<double> _glowAnim;
@@ -40,9 +43,10 @@ class _MetronomePageState extends State<MetronomePage>
       vsync: this,
       duration: const Duration(milliseconds: 160),
     );
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.22).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOut),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.22,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOut));
     _pulseCtrl.addStatusListener((s) {
       if (s == AnimationStatus.completed) _pulseCtrl.reverse();
     });
@@ -51,9 +55,10 @@ class _MetronomePageState extends State<MetronomePage>
       vsync: this,
       duration: const Duration(milliseconds: 320),
     );
-    _glowAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _glowCtrl, curve: Curves.easeOut),
-    );
+    _glowAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _glowCtrl, curve: Curves.easeOut));
     _glowCtrl.addStatusListener((s) {
       if (s == AnimationStatus.completed) _glowCtrl.reverse();
     });
@@ -70,13 +75,13 @@ class _MetronomePageState extends State<MetronomePage>
     _pulseCtrl.dispose();
     _glowCtrl.dispose();
     _pendulumCtrl.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
   // ── Metronome control ──────────────────────────────────────────────────────
 
-  Duration get _beatDuration =>
-      Duration(milliseconds: (60000 / _bpm).round());
+  Duration get _beatDuration => Duration(milliseconds: (60000 / _bpm).round());
 
   void _startMetronome() {
     _timer?.cancel();
@@ -97,11 +102,16 @@ class _MetronomePageState extends State<MetronomePage>
   void _tick() {
     if (!mounted) return;
     HapticFeedback.lightImpact();
+    // Play a short synth beep for metronome tick
+    _audioPlayer.play(AssetSource('sounds/high_beep.wav'));
+    
     _pulseCtrl.forward(from: 0);
     _glowCtrl.forward(from: 0);
     setState(() => _beatActive = true);
-    Future.delayed(const Duration(milliseconds: 80),
-        () => mounted ? setState(() => _beatActive = false) : null);
+    Future.delayed(
+      const Duration(milliseconds: 80),
+      () => mounted ? setState(() => _beatActive = false) : null,
+    );
   }
 
   void _togglePlay() {
@@ -137,8 +147,7 @@ class _MetronomePageState extends State<MetronomePage>
     if (_tapTimes.length >= 2) {
       final intervals = <int>[];
       for (int i = 1; i < _tapTimes.length; i++) {
-        intervals.add(
-            _tapTimes[i].difference(_tapTimes[i - 1]).inMilliseconds);
+        intervals.add(_tapTimes[i].difference(_tapTimes[i - 1]).inMilliseconds);
       }
       final avgMs = intervals.reduce((a, b) => a + b) / intervals.length;
       final tappedBpm = (60000 / avgMs).clamp(20.0, 300.0);
@@ -253,7 +262,9 @@ class _MetronomePageState extends State<MetronomePage>
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                              color: colorScheme.onSurfaceVariant.withOpacity(
+                                0.8,
+                              ),
                               letterSpacing: 2,
                             ),
                           ),
@@ -277,8 +288,9 @@ class _MetronomePageState extends State<MetronomePage>
                       thumbColor: colorScheme.onPrimary,
                       overlayColor: colorScheme.primary.withOpacity(0.14),
                       trackHeight: 3,
-                      thumbShape:
-                          const RoundSliderThumbShape(enabledThumbRadius: 7),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 7,
+                      ),
                     ),
                     child: Slider(
                       value: _bpm,
@@ -312,10 +324,7 @@ class _MetronomePageState extends State<MetronomePage>
             // ── Play / Stop ─────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: _PlayStopButton(
-                isPlaying: _isPlaying,
-                onTap: _togglePlay,
-              ),
+              child: _PlayStopButton(isPlaying: _isPlaying, onTap: _togglePlay),
             ),
 
             const SizedBox(height: 14),
@@ -332,9 +341,9 @@ class _MetronomePageState extends State<MetronomePage>
   }
 
   TextStyle get _labelStyle => GoogleFonts.inter(
-        fontSize: 11,
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
-      );
+    fontSize: 11,
+    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+  );
 }
 
 // ── Beat Visual ───────────────────────────────────────────────────────────────
@@ -383,14 +392,16 @@ class _BeatVisual extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: colorScheme.primary
-                                .withOpacity(0.38 * glowAnim.value),
+                            color: colorScheme.primary.withOpacity(
+                              0.38 * glowAnim.value,
+                            ),
                             blurRadius: 50,
                             spreadRadius: 12,
                           ),
                           BoxShadow(
-                            color: colorScheme.primaryContainer
-                                .withOpacity(0.18 * glowAnim.value),
+                            color: colorScheme.primaryContainer.withOpacity(
+                              0.18 * glowAnim.value,
+                            ),
                             blurRadius: 80,
                             spreadRadius: 20,
                           ),
@@ -410,9 +421,8 @@ class _BeatVisual extends StatelessWidget {
                 AnimatedBuilder(
                   animation: pendulumCtrl,
                   builder: (context, _) {
-                    final angle = math.pi *
-                        0.35 *
-                        math.sin(pendulumCtrl.value * math.pi);
+                    final angle =
+                        math.pi * 0.35 * math.sin(pendulumCtrl.value * math.pi);
                     return Transform.rotate(
                       angle: angle - math.pi * 0.35,
                       alignment: Alignment.bottomCenter,
@@ -562,9 +572,15 @@ class _NudgeButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          ),
         ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
       ),
     );
   }
@@ -591,9 +607,13 @@ class _PlayStopButtonState extends State<_PlayStopButton>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 110));
-    _scale = Tween<double>(begin: 1.0, end: 0.96)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 110),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.96,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -621,15 +641,21 @@ class _PlayStopButtonState extends State<_PlayStopButton>
             gradient: LinearGradient(
               colors: widget.isPlaying
                   ? [const Color(0xFFF43F5E), const Color(0xFFBE123C)]
-                  : [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+                  : [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: (widget.isPlaying ? const Color(0xFFF43F5E) : Theme.of(context).colorScheme.primary)
-                    .withOpacity(0.40),
+                color:
+                    (widget.isPlaying
+                            ? const Color(0xFFF43F5E)
+                            : Theme.of(context).colorScheme.primary)
+                        .withOpacity(0.40),
                 blurRadius: 22,
                 offset: const Offset(0, 6),
                 spreadRadius: -3,
@@ -682,9 +708,13 @@ class _TapTempoButtonState extends State<_TapTempoButton>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 100));
-    _scale = Tween<double>(begin: 1.0, end: 0.93)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.93,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -731,7 +761,9 @@ class _TapTempoButtonState extends State<_TapTempoButton>
                 'Tap repeatedly to set tempo',
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withOpacity(0.8),
                 ),
               ),
             ],

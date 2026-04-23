@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,12 +17,15 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
   // ── State ──────────────────────────────────────────────────────────────────
   double _bpm = 30; // Cycles per minute
   bool _isPlaying = false;
-  
+
   int _innerBeats = 3;
   int _outerBeats = 4;
 
   int _lastInnerBeat = -1;
   int _lastOuterBeat = -1;
+
+  final AudioPlayer _outerPlayer = AudioPlayer();
+  final AudioPlayer _innerPlayer = AudioPlayer();
 
   // ── Animations ─────────────────────────────────────────────────────────────
   late AnimationController _sweepCtrl;
@@ -30,11 +34,8 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
   void initState() {
     super.initState();
 
-    _sweepCtrl = AnimationController(
-      vsync: this,
-      duration: _cycleDuration,
-    );
-    
+    _sweepCtrl = AnimationController(vsync: this, duration: _cycleDuration);
+
     _sweepCtrl.addListener(_onTick);
     _sweepCtrl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -50,24 +51,26 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
   @override
   void dispose() {
     _sweepCtrl.dispose();
+    _outerPlayer.dispose();
+    _innerPlayer.dispose();
     super.dispose();
   }
 
-  Duration get _cycleDuration =>
-      Duration(milliseconds: (60000 / _bpm).round());
+  Duration get _cycleDuration => Duration(milliseconds: (60000 / _bpm).round());
 
   void _onTick() {
     if (!_isPlaying) return;
 
     final val = _sweepCtrl.value;
-    
+
     // Check outer beats
     final outerBeat = (val * _outerBeats).floor();
     if (outerBeat > _lastOuterBeat) {
       _lastOuterBeat = outerBeat;
       HapticFeedback.lightImpact();
+      _outerPlayer.play(AssetSource('sounds/low_beep.wav'));
     }
-    
+
     // Check inner beats
     final innerBeat = (val * _innerBeats).floor();
     if (innerBeat > _lastInnerBeat) {
@@ -75,6 +78,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
       // Slightly heavier impact for inner beat to distinguish (if supported),
       // otherwise standard light impact. Using medium for variety.
       HapticFeedback.mediumImpact();
+      _innerPlayer.play(AssetSource('sounds/high_beep.wav'));
     }
   }
 
@@ -138,7 +142,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
         child: Column(
           children: [
             const SizedBox(height: 16),
-            
+
             // ── Explanation Label ──────────────────────────────────────────
             Text(
               '$_outerBeats over $_innerBeats',
@@ -252,7 +256,9 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                              color: colorScheme.onSurfaceVariant.withOpacity(
+                                0.8,
+                              ),
                               letterSpacing: 2,
                             ),
                           ),
@@ -276,8 +282,9 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                       thumbColor: colorScheme.onTertiary,
                       overlayColor: colorScheme.tertiary.withOpacity(0.14),
                       trackHeight: 3,
-                      thumbShape:
-                          const RoundSliderThumbShape(enabledThumbRadius: 7),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 7,
+                      ),
                     ),
                     child: Slider(
                       value: _bpm,
@@ -290,10 +297,7 @@ class _PolyrhythmPageState extends State<PolyrhythmPage>
                   const SizedBox(height: 24),
 
                   // Play / Stop
-                  _PlayStopButton(
-                    isPlaying: _isPlaying,
-                    onTap: _togglePlay,
-                  ),
+                  _PlayStopButton(isPlaying: _isPlaying, onTap: _togglePlay),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -326,7 +330,7 @@ class _PolyrhythmPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     final maxRadius = size.width / 2;
     final rOuter = maxRadius * 0.85;
     final rInner = maxRadius * 0.55;
@@ -364,16 +368,19 @@ class _PolyrhythmPainter extends CustomPainter {
         true,
         sweepPaint,
       );
-      
+
       // Radar line
       final linePaint = Paint()
         ..color = colorScheme.tertiary
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
-      
+
       canvas.drawLine(
         Offset(cx, cy),
-        Offset(cx + rOuter * math.cos(currentAngle), cy + rOuter * math.sin(currentAngle)),
+        Offset(
+          cx + rOuter * math.cos(currentAngle),
+          cy + rOuter * math.sin(currentAngle),
+        ),
         linePaint,
       );
     }
@@ -394,20 +401,20 @@ class _PolyrhythmPainter extends CustomPainter {
       final by = cy + rInner * math.sin(angle);
 
       final fade = getFade(beatFrac);
-      
+
       // Base dot
       canvas.drawCircle(
-        Offset(bx, by), 
-        5.0, 
-        Paint()..color = colorScheme.primary
+        Offset(bx, by),
+        5.0,
+        Paint()..color = colorScheme.primary,
       );
 
       // Pulse glow
       if (fade > 0) {
         canvas.drawCircle(
-          Offset(bx, by), 
-          5.0 + (fade * 8.0), 
-          Paint()..color = colorScheme.primaryContainer.withOpacity(fade * 0.8)
+          Offset(bx, by),
+          5.0 + (fade * 8.0),
+          Paint()..color = colorScheme.primaryContainer.withOpacity(fade * 0.8),
         );
       }
     }
@@ -420,30 +427,27 @@ class _PolyrhythmPainter extends CustomPainter {
       final by = cy + rOuter * math.sin(angle);
 
       final fade = getFade(beatFrac);
-      
+
       // Base dot
       canvas.drawCircle(
-        Offset(bx, by), 
-        6.0, 
-        Paint()..color = colorScheme.tertiary
+        Offset(bx, by),
+        6.0,
+        Paint()..color = colorScheme.tertiary,
       );
 
       // Pulse glow
       if (fade > 0) {
         canvas.drawCircle(
-          Offset(bx, by), 
-          6.0 + (fade * 10.0), 
-          Paint()..color = colorScheme.tertiaryContainer.withOpacity(fade * 0.8)
+          Offset(bx, by),
+          6.0 + (fade * 10.0),
+          Paint()
+            ..color = colorScheme.tertiaryContainer.withOpacity(fade * 0.8),
         );
       }
     }
 
     // Center pivot
-    canvas.drawCircle(
-      Offset(cx, cy),
-      4.0,
-      Paint()..color = Colors.white,
-    );
+    canvas.drawCircle(Offset(cx, cy), 4.0, Paint()..color = Colors.white);
   }
 
   @override
@@ -492,7 +496,11 @@ class _LayerPicker extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 color: Colors.transparent,
-                child: Icon(Icons.remove_circle_outline, color: color, size: 24),
+                child: Icon(
+                  Icons.remove_circle_outline,
+                  color: color,
+                  size: 24,
+                ),
               ),
             ),
             SizedBox(
@@ -517,7 +525,7 @@ class _LayerPicker extends StatelessWidget {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -545,9 +553,15 @@ class _NudgeButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          ),
         ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
       ),
     );
   }
@@ -572,9 +586,13 @@ class _PlayStopButtonState extends State<_PlayStopButton>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 110));
-    _scale = Tween<double>(begin: 1.0, end: 0.96)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 110),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.96,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -602,15 +620,21 @@ class _PlayStopButtonState extends State<_PlayStopButton>
             gradient: LinearGradient(
               colors: widget.isPlaying
                   ? [const Color(0xFFF43F5E), const Color(0xFFBE123C)]
-                  : [Theme.of(context).colorScheme.tertiary, const Color(0xFF0D9488)],
+                  : [
+                      Theme.of(context).colorScheme.tertiary,
+                      const Color(0xFF0D9488),
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: (widget.isPlaying ? const Color(0xFFF43F5E) : Theme.of(context).colorScheme.tertiary)
-                    .withOpacity(0.40),
+                color:
+                    (widget.isPlaying
+                            ? const Color(0xFFF43F5E)
+                            : Theme.of(context).colorScheme.tertiary)
+                        .withOpacity(0.40),
                 blurRadius: 22,
                 offset: const Offset(0, 6),
                 spreadRadius: -3,
