@@ -15,7 +15,7 @@
 - **Progression Builder**  
   Compose and save chord sequences intuitively. Supports transposition, custom song titles, and local offline storage so you never lose an idea.
 
-- ⏱ **Metronome & Tap Tempo**  
+- **Metronome & Tap Tempo**  
   A high-precision visual metronome featuring a swinging pendulum, beat visualizers, BPM slider, and a robust tap-tempo calculator.
 
 - **Polyrhythm Generator**  
