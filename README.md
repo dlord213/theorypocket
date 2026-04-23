@@ -1,10 +1,10 @@
-# TheoryPocket 🎸🎹🎼
+# TheoryPocket
 
 **TheoryPocket** is a comprehensive, interactive music theory and utility toolset built with Flutter. Whether you're learning the fundamentals of harmony, practicing complex rhythms, or composing your next track, TheoryPocket provides a suite of dynamic tools tailored for musicians of all levels.
 
 ---
 
-## ✨ Features
+## Features
 
 - 🎡 **Circle of Fifths**  
   An interactive, sweeping visualization to navigate tonality, keys, and relative minors.
@@ -32,17 +32,7 @@
 
 ---
 
-## 🎨 Design System
-
-TheoryPocket abandons static color styling in favor of a strictly dynamic **Material 3 / OneUI** design language:
-
-- Full support for adaptive **Light and Dark mode** driven by system preferences.
-- Uses `Theme.of(context).colorScheme` throughout, offering dynamic and consistent tones across all components.
-- Heavily utilizes smooth, tactile micro-animations (e.g., custom scale taps, sweeping radials, pendulum paths) and rich visual feedback.
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -73,20 +63,6 @@ TheoryPocket abandons static color styling in favor of a strictly dynamic **Mate
 
 ---
 
-## 📦 Tech Stack
-
-- **Framework:** Flutter / Dart
-- **Design:** Material 3, Google Fonts
-- **State Management:** Riverpod (`hooks_riverpod`)
-- **Routing:** Go Router
-- **Database:** SQLite (`sqflite` & `sqflite_common_ffi`)
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
