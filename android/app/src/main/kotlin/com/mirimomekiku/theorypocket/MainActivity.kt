@@ -1,4 +1,4 @@
-package com.example.theorypocket
+package com.mirimomekiku.theorypocket
 
 import io.flutter.embedding.android.FlutterActivity
 
